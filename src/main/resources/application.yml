@@ -1,0 +1,39 @@
+spring :
+  profiles:
+    active : dev
+
+logging:
+  level:
+    org.hibernate.SQL : debug
+    org.hibernate.type : trace
+---
+spring :
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url : #h2 url
+    username : #name
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa :
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate :
+        format_sql : true
+
+  data :
+    web :
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+
+
+
+
+
+
+
