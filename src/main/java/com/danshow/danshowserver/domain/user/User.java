@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn
+@DiscriminatorColumn(name = "DTYPE")
 public class User extends BaseTimeEntity {
 
     @Id
@@ -28,6 +28,7 @@ public class User extends BaseTimeEntity {
 
     @Column(length = 20, nullable = false)
     private String name;
+
 
     public User(String email, String password, String nickname, String name) {
        this.email = email;

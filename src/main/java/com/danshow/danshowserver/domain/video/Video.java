@@ -18,13 +18,14 @@ public class Video extends BaseTimeEntity {
     private Long id;
 
     private String title;
-    private Integer difficulty;
+    private Long difficulty;
     private String video_address;
     private String gender;
     private String directory;
     private String genre;
-    private Integer click;
-    private Integer length;
+    private Long click;
+    private Long length;
+    private String type;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
