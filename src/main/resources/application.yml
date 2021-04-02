@@ -4,8 +4,8 @@ spring :
 
 logging:
   level:
-    org.hibernate.SQL : debug
-    org.hibernate.type : trace
+    org.hibernate.SQL : #debug #sql이 3번씩 출력되길래 주석처리 했습니다. 그래도 2번씩 나옵니다.
+    org.hibernate.type : #trace
 ---
 spring :
   config:
@@ -13,8 +13,8 @@ spring :
       on-profile: dev
 
   datasource:
-    url : #h2 url
-    username : #name
+    url : jdbc:h2:tcp://localhost/~/test #h2 url
+    username : sa #username
     password:
     driver-class-name: org.h2.Driver
 
