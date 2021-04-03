@@ -1,6 +1,7 @@
 package com.danshow.danshowserver.domain.crew;
 
 import com.danshow.danshowserver.domain.BaseTimeEntity;
+import com.danshow.danshowserver.domain.composite.MemberCrew;
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.Member;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class Crew extends BaseTimeEntity {
     @JoinColumn(name ="user_id")
     private Dancer dancer;
 
-    @ManyToMany(mappedBy = "crewList")
-    private List<Member> memberList;
+    @OneToMany(mappedBy = "crew")
+    private List<MemberCrew> memberCrewList;
+
 }

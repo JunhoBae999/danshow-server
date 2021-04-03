@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.domain.user;
 
+import com.danshow.danshowserver.domain.composite.MemberCrew;
 import com.danshow.danshowserver.domain.composite.MemberVideo;
 import com.danshow.danshowserver.domain.crew.Crew;
 import com.danshow.danshowserver.domain.video.MemberTestVideo;
@@ -42,16 +43,9 @@ public class Member extends User {
         }
     }
 
-    @ManyToMany
-    @JoinTable(name = "Member_Crew",
-    joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "crew_id"))
-    private List<Crew> crewList = new ArrayList<Crew>();
+    @OneToMany(mappedBy = "member")
+    private List<MemberCrew> memberCrewList;
 
-    public void addCrew(Crew crew) {
-        crewList.add(crew);
-        crew.getMemberList().add(this);
-    }
 
     @OneToMany(mappedBy = "member")
     private List<MemberVideo> memberVideoList;
