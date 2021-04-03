@@ -3,6 +3,7 @@ package com.danshow.danshowserver.domain.user;
 import com.danshow.danshowserver.domain.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "DTYPE")
+@NoArgsConstructor
 public class User extends BaseTimeEntity {
 
     @Id

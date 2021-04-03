@@ -7,6 +7,7 @@ import com.danshow.danshowserver.domain.video.MemberTestVideo;
 import com.danshow.danshowserver.domain.video.Video;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @Setter
 @Entity
 @DiscriminatorValue("Member")
+@NoArgsConstructor
 public class Member extends User {
 
     private Boolean membership;
@@ -34,6 +36,7 @@ public class Member extends User {
 
     @OneToMany(mappedBy = "member")
     private List<MemberTestVideo> memberTestVideoList = new ArrayList<MemberTestVideo>();
+
 
     public void addVideo (MemberTestVideo memberTestVideo) {
         this.memberTestVideoList.add(memberTestVideo);

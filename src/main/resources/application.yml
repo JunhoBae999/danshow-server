@@ -13,7 +13,7 @@ spring :
       on-profile: dev
 
   datasource:
-    url : jdbc:h2:tcp://localhost/~/test #h2 url
+    url : jdbc:h2:tcp://localhost/~/danshow #h2 url
     username : sa #username
     password:
     driver-class-name: org.h2.Driver
