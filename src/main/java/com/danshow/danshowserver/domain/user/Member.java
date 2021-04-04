@@ -5,10 +5,7 @@ import com.danshow.danshowserver.domain.composite.MemberVideo;
 import com.danshow.danshowserver.domain.crew.Crew;
 import com.danshow.danshowserver.domain.video.MemberTestVideo;
 import com.danshow.danshowserver.domain.video.Video;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @DiscriminatorValue("Member")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends User {
 
     private Boolean membership;

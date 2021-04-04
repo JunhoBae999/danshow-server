@@ -4,13 +4,16 @@ import com.danshow.danshowserver.domain.BaseTimeEntity;
 import com.danshow.danshowserver.domain.composite.MemberCrew;
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.Member;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseTimeEntity {
 
     @Id

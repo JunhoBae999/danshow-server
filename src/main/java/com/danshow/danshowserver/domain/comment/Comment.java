@@ -5,7 +5,9 @@ import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.video.CoverVideo;
 import com.danshow.danshowserver.domain.video.Video;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +15,7 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
 
     @Id

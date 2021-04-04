@@ -2,9 +2,7 @@ package com.danshow.danshowserver.domain.user;
 
 import com.danshow.danshowserver.domain.crew.Crew;
 import com.danshow.danshowserver.domain.video.Video;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.List;
 @Setter
 @Entity
 @DiscriminatorValue("Dancer")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Dancer extends User {
 
     private Boolean membership;
