@@ -1,7 +1,9 @@
 package com.danshow.danshowserver.domain.video;
 
 import com.danshow.danshowserver.domain.comment.Comment;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +15,7 @@ import java.util.List;
 @Table(name = "Cover_Video")
 @Entity
 @DiscriminatorValue("cover")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CoverVideo extends Video{
 
     private String song_name;

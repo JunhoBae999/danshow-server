@@ -3,7 +3,9 @@ package com.danshow.danshowserver.domain.video;
 
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.Member;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -11,6 +13,7 @@ import javax.persistence.*;
 @Table(name = "member_test_video")
 @Entity
 @DiscriminatorValue("member_test")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberTestVideo extends Video{
 
     @ManyToOne

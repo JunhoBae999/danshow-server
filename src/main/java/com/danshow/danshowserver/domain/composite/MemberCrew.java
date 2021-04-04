@@ -2,7 +2,9 @@ package com.danshow.danshowserver.domain.composite;
 
 import com.danshow.danshowserver.domain.crew.Crew;
 import com.danshow.danshowserver.domain.user.Member;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -10,6 +12,7 @@ import javax.persistence.*;
 @Table(name = "Member_crew")
 @IdClass(MemberCrewId.class)
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberCrew {
     @Id
     @ManyToOne
