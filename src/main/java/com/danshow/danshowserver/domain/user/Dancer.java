@@ -34,9 +34,9 @@ public class Dancer extends User {
     private Crew crew;
 
     @Builder
-    public Dancer(String email, String password, String nickname, String name,
+    public Dancer(String email, String nickname, String name,
                   Boolean membership, String dancer_description, String dancer_picture){
-        super(email,password,nickname,name);
+        super(email,nickname,name);
         this.membership = membership;
         this.dancer_description = dancer_description;
         this.dancer_picture = dancer_picture;
