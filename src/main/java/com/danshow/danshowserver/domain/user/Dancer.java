@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Dancer extends User {
 
-    private Boolean membership;
     private String dancer_description;
     private String dancer_picture;
 
@@ -35,9 +34,8 @@ public class Dancer extends User {
 
     @Builder
     public Dancer(String email, String nickname, String name,
-                  Boolean membership, String dancer_description, String dancer_picture){
+                  String dancer_description, String dancer_picture){
         super(email,nickname,name);
-        this.membership = membership;
         this.dancer_description = dancer_description;
         this.dancer_picture = dancer_picture;
     }
