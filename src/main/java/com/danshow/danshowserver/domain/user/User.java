@@ -29,7 +29,6 @@ public class User extends BaseTimeEntity {
     @Column(length = 20, nullable = false)
     private String name;
 
-
     public User(String email, String nickname, String name) {
        this.email = email;
        this.nickname = nickname;

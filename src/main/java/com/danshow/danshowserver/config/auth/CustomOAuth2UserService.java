@@ -37,6 +37,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         OAuthAttributes attributes = new OAuthAttributes(oAuth2User.getAttributes());
 
+        /*TODO 프린트 빼기*/
         System.out.println("attributes = " + attributes);
 
         User user = saveOrUpdate(attributes);
@@ -49,6 +50,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private User saveOrUpdate(OAuthAttributes attributes) {
+        /*TODO 업데이트 구현하기*/
         User user = userRepository.findByEmail(attributes.getEmail());
 
         if(user == null) {

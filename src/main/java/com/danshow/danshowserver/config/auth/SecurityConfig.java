@@ -20,7 +20,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                     .antMatchers("/","/css/**",
                             "/images/**","/js/**","/h2-console/**").permitAll()
-                    .antMatchers("/test.html").authenticated()
+                    .anyRequest().authenticated() //TODO 허용 url 수정하기
+                .and()
+                    .logout()
+                        .logoutSuccessUrl("/")
                 .and()
                     .oauth2Login()
                         .userInfoEndpoint()
