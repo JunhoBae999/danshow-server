@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "DTYPE")
+//@DiscriminatorColumn(name = "DTYPE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
@@ -29,10 +29,14 @@ public class User extends BaseTimeEntity {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public User(String email, String nickname, String name) {
+    @Column
+    private String dType;
+
+    public User(String email, String nickname, String name, String dType) {
        this.email = email;
        this.nickname = nickname;
        this.name = name;
+       this.dType = dType;
     }
 
     @OneToOne

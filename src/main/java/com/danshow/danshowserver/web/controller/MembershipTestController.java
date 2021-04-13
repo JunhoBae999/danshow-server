@@ -53,9 +53,9 @@ public class MembershipTestController {
         SessionUser user = (SessionUser) httpSession.getAttribute("user");
         Member member = memberRepository.findByEmail(user.getEmail());
         if(member==null) {
-            return user.getEmail()+"\ndancer";
+            return user.getEmail()+" dancer";
         }
-        return user.getEmail()+"\nmember";
+        return user.getEmail()+" member "+member.getMembership();
     }
 
     @GetMapping("/upgrade-to-dancer")

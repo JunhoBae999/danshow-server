@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("Dancer")
+//@DiscriminatorValue("Dancer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Dancer extends User {
 
@@ -35,7 +35,7 @@ public class Dancer extends User {
     @Builder
     public Dancer(String email, String nickname, String name,
                   String dancer_description, String dancer_picture){
-        super(email,nickname,name);
+        super(email,nickname,name,"Dancer");
         this.dancer_description = dancer_description;
         this.dancer_picture = dancer_picture;
     }

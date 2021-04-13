@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("Member")
+//@DiscriminatorValue("Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends User {
 
@@ -25,7 +25,7 @@ public class Member extends User {
     @Builder
     public Member(String email, String nickname, String name,
                   Boolean membership, String profile_description, String profile_picture){
-        super(email,nickname,name);
+        super(email,nickname,name,"Member");
         this.membership = membership;
         this.profile_description = profile_description;
         this.profile_picture = profile_picture;
