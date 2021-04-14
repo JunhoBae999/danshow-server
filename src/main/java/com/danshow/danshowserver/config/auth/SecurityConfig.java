@@ -19,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                     .antMatchers("/","/css/**",
-                            "/images/**","/js/**","/h2-console/**").permitAll()
+                            "/images/**","/js/**","/h2-console/**","/api/v1/file").permitAll() //TODO : 테스트 끝나면 file 엔드포인트 제거
                     .anyRequest().authenticated() //TODO 허용 url 수정하기
                 .and()
                     .logout()
