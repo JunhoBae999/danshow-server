@@ -19,9 +19,8 @@ public class VideoController {
     @PostMapping("/api/v1/file")
     public String fileUpload(@RequestParam MultipartFile video) {
 
-        videoService.save(video);
-
-
+        //videoService.save(video);
+        return null;
     }
 
 

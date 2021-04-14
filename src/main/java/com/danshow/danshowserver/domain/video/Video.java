@@ -20,25 +20,29 @@ public class Video extends BaseTimeEntity {
     @Column(name ="video_id")
     private Long id;
 
-    private String title;
-    private Long difficulty;
-    private String video_address;
-    private String gender;
-    private String directory;
-    private String genre;
-    private Long click;
-    private Long length;
-    private String type;
+    @Column(nullable = false)
+    private String originalFileName;
+
+    @Column(nullable = false)
+    private String filename;
+
+    @Column(nullable = false)
+    private String filePath;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "dancer_id")
     private Dancer dancer;
+    //TODO : USER를 참조하면 안될까
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="video_post_id")
+    private VideoPost videoPost;
+
+    public void setVideoPost(VideoPost videoPost) {
+        this.videoPost = videoPost;
+    }
 
     public void setDancer(Dancer dancer) {
         this.dancer = dancer;
-        //무한루프 방지
-        if(!dancer.getVideoList().contains(this)) {
-            dancer.getVideoList().add(this);
-        }
     }
 }

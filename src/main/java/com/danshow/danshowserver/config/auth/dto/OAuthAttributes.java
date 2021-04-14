@@ -1,8 +1,6 @@
 package com.danshow.danshowserver.config.auth.dto;
 
 import com.danshow.danshowserver.domain.user.Member;
-import com.danshow.danshowserver.domain.user.MemberRepository;
-import com.danshow.danshowserver.domain.user.User;
 import lombok.Getter;
 
 import java.util.Map;

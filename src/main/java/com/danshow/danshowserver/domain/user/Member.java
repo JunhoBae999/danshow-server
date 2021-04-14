@@ -2,9 +2,7 @@ package com.danshow.danshowserver.domain.user;
 
 import com.danshow.danshowserver.domain.composite.MemberCrew;
 import com.danshow.danshowserver.domain.composite.MemberVideo;
-import com.danshow.danshowserver.domain.crew.Crew;
 import com.danshow.danshowserver.domain.video.MemberTestVideo;
-import com.danshow.danshowserver.domain.video.Video;
 import lombok.*;
 
 import javax.persistence.*;
