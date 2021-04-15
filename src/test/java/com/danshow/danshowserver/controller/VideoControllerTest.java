@@ -83,6 +83,7 @@ class VideoControllerTest {
                 "video/mp4",
                 "video test".getBytes(StandardCharsets.UTF_8));
 
+
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
                 1L,"idol","boy",1L,"lecture"));
 
@@ -101,6 +102,7 @@ class VideoControllerTest {
 
         String output = result.getResponse().getContentAsString();
 
+        System.out.println("=====resonse content======");
         System.out.println(output);
 
     }

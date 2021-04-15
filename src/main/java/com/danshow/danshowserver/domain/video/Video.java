@@ -2,17 +2,17 @@ package com.danshow.danshowserver.domain.video;
 
 import com.danshow.danshowserver.domain.BaseTimeEntity;
 import com.danshow.danshowserver.domain.user.Dancer;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@Builder
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Video extends BaseTimeEntity {
 
     @Id
