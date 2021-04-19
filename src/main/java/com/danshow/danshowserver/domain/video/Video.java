@@ -13,7 +13,7 @@ import javax.persistence.*;
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Video extends BaseTimeEntity {
+public abstract class Video extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

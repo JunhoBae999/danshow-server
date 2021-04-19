@@ -25,6 +25,4 @@ public class VideoPostSaveDto {
 
     private String type;
 
-
-
 }
