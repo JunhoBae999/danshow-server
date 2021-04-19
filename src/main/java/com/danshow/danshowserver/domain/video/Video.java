@@ -2,10 +2,9 @@ package com.danshow.danshowserver.domain.video;
 
 import com.danshow.danshowserver.domain.BaseTimeEntity;
 import com.danshow.danshowserver.domain.user.Dancer;
+import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.springframework.http.ContentDisposition;
 
 import javax.persistence.*;
 
@@ -31,9 +30,8 @@ public class Video extends BaseTimeEntity {
     private String filePath;
 
     @ManyToOne
-    @JoinColumn(name = "dancer_id")
-    private Dancer dancer;
-    //TODO : USER를 참조하면 안될까
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToOne(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
     private VideoPost videoPost;
@@ -43,7 +41,7 @@ public class Video extends BaseTimeEntity {
         this.videoPost = videoPost;
     }
 
-    public void setDancer(Dancer dancer) {
-        this.dancer = dancer;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

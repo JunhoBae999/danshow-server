@@ -5,7 +5,6 @@ import com.danshow.danshowserver.domain.user.*;
 import com.danshow.danshowserver.web.dto.MemberSaveRequestDto;
 import com.danshow.danshowserver.web.dto.MemberUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.junit.Test;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

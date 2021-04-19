@@ -23,7 +23,7 @@ public class Member extends User {
     @Builder
     public Member(String email, String nickname, String name,
                   Boolean membership, String profile_description, String profile_picture){
-        super(email,nickname,name,"Member");
+        super(email,nickname,name);
         this.membership = membership;
         this.profile_description = profile_description;
         this.profile_picture = profile_picture;

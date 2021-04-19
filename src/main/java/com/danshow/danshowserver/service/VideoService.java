@@ -2,6 +2,8 @@ package com.danshow.danshowserver.service;
 
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.DancerRepository;
+import com.danshow.danshowserver.domain.user.User;
+import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.Video;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
@@ -24,9 +26,11 @@ public class VideoService {
 
     private final DancerRepository dancerRepository;
 
+    private final UserRepository userRepository;
+
     public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception {
 
-        Dancer dancer = dancerRepository.findByEmail(userId);
+        User dancer = userRepository.findByEmail(userId);
         Video uploadedVideo = uploadVideo(video);
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo);
 

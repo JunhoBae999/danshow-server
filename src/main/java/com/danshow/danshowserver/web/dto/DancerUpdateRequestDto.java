@@ -1,7 +1,6 @@
 package com.danshow.danshowserver.web.dto;
 
 import com.danshow.danshowserver.domain.user.Dancer;
-import com.danshow.danshowserver.domain.user.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

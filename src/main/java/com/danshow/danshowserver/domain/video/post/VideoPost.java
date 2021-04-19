@@ -1,7 +1,6 @@
 package com.danshow.danshowserver.domain.video.post;
 
 import com.danshow.danshowserver.domain.user.Dancer;
-import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.video.Video;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
@@ -60,12 +59,12 @@ public class VideoPost {
     }
 
     //Post 생성을 위한
-    public static VideoPost createVideoPost(VideoPostSaveDto videoPostSaveDto, Dancer dancer, Video requestVideo) {
+    public static VideoPost createVideoPost(VideoPostSaveDto videoPostSaveDto, User user, Video requestVideo) {
         VideoPost videoPost = new VideoPost();
 
         videoPost.description = videoPostSaveDto.getDescription();
         videoPost.title = videoPostSaveDto.getTitle();
-        videoPost.user = dancer;
+        videoPost.user = user;
         videoPost.gender = videoPostSaveDto.getGender();
         videoPost.genre = videoPostSaveDto.getGenre();
         videoPost.length = videoPostSaveDto.getLength();
@@ -74,7 +73,7 @@ public class VideoPost {
         videoPost.video = requestVideo;
 
         requestVideo.setVideoPost(videoPost);
-        requestVideo.setDancer(dancer);
+        requestVideo.setUser(user);
 
         return videoPost;
 
