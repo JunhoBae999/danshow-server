@@ -1,7 +1,6 @@
 package com.danshow.danshowserver.domain.composite;
 
 import com.danshow.danshowserver.domain.user.Member;
-import com.danshow.danshowserver.domain.video.Video;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import lombok.AccessLevel;
 import lombok.Getter;

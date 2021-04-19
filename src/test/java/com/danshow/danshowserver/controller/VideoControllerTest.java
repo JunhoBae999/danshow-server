@@ -75,11 +75,17 @@ class VideoControllerTest {
     @Test
     @DisplayName("안무가가 영상과 포스팅을 함께 올리는 경우 테스")
     public void videoUploadTest() throws Exception {
+
+
         MockMultipartFile video = new MockMultipartFile("video",
                 "video.mp4",
                 "video/mp4",
                 "video test".getBytes(StandardCharsets.UTF_8));
 
+        MockMultipartFile image = new MockMultipartFile("thumbnail",
+                "image.jpeg",
+                "image/jpeg",
+                "image test".getBytes(StandardCharsets.UTF_8));
 
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
                 1L,"idol","boy",1L,"lecture"));
@@ -88,6 +94,7 @@ class VideoControllerTest {
 
         MvcResult result = this.mockMvc.perform(multipart("/api/v1/file")
                 .file(video)
+                .file(image)
                 .file(json)
                 .param("userID", "test.test@test.test")
                 .contentType("multipart/mixed")

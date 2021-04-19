@@ -1,37 +1,49 @@
 package com.danshow.danshowserver.controller;
 
-import com.danshow.danshowserver.domain.video.Video;
-import com.danshow.danshowserver.service.VideoService;
+import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
+import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
 public class VideoController {
 
-    private final VideoService videoService;
+    private final VideoServiceInterface videoService;
 
     @PostMapping("/api/v1/file")
     public ResponseEntity fileUpload(@RequestPart("video")  MultipartFile video,
                                      @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
-                                     @RequestParam("userID") String userId)  {
+                                     @RequestParam("userID") String userId, @RequestPart(value = "thumbnail",required = false) MultipartFile image)  {
 
-        //TODO: 유저 검색 방식 확정 필요
         try {
-            videoService.save(video,videoPostSaveDto,userId);
+            videoService.save(video,videoPostSaveDto,userId,image);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
+
+    @GetMapping("/api/v1/post/{id}")
+    public ResponseEntity<VideoPostResponseDto> getPost(@PathVariable Long id) {
+        return null;
+    }
+
+
+    @GetMapping("/api/v1/videos/{name}")
+    public ResponseEntity<ResourceRegion> getVideo(@PathVariable String name, @RequestHeader HttpHeaders headers) throws IOException {
+        return null;
+    }
+
+
+
 
 }

@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@Rollback(value = false)
 class UserRepositoryTest {
 
     @Autowired
@@ -67,5 +66,25 @@ class UserRepositoryTest {
         assertThat(findUser instanceof Dancer).isFalse();
 
     }
+
+    @Test
+    @DisplayName("userRepository로 멤버, 댄서 세이브 되는지 확인")
+    public void saveTest() {
+
+        Member member = Member.builder()
+                .email("testmember@test.com")
+                .nickname("testnick")
+                .membership(true)
+                .name("junho")
+                .build();
+
+        userRepository.save(member);
+
+        Member findUser =  memberRepository.findByEmail("testmember@test.com");
+
+        assertThat(findUser.getNickname()).isEqualTo(member.getNickname());
+
+    }
+
 
 }

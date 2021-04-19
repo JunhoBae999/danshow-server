@@ -1,8 +1,7 @@
 package com.danshow.danshowserver.domain.video.post;
 
-import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.User;
-import com.danshow.danshowserver.domain.video.Video;
+import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,7 +27,11 @@ public class VideoPost {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="video_id")
-    private Video video;
+    private AttachFile video;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="image_id")
+    private AttachFile image;
 
     private String title;
 
@@ -46,12 +49,14 @@ public class VideoPost {
 
     private String type;
 
-    private String song_name;
+    private String songName;
 
-    //연관관계 메서드
-    public void addFile(Video video) {
-        video.setVideoPost(this);
+    public void setVideo(AttachFile video) {
         this.video = video;
+    }
+
+    public void setImage(AttachFile image) {
+        this.image = image;
     }
 
     public void increaseClick() {
@@ -59,7 +64,7 @@ public class VideoPost {
     }
 
     //Post 생성을 위한
-    public static VideoPost createVideoPost(VideoPostSaveDto videoPostSaveDto, User user, Video requestVideo) {
+    public static VideoPost createVideoPost(VideoPostSaveDto videoPostSaveDto, User user, AttachFile requestVideo, AttachFile requestImage) {
         VideoPost videoPost = new VideoPost();
 
         videoPost.description = videoPostSaveDto.getDescription();
@@ -74,6 +79,8 @@ public class VideoPost {
 
         requestVideo.setVideoPost(videoPost);
         requestVideo.setUser(user);
+
+        requestImage.setVideoPost(videoPost);
 
         return videoPost;
 

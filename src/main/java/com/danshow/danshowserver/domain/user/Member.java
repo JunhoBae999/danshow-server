@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-//@DiscriminatorValue("Member")
+@DiscriminatorValue("Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends User {
 
