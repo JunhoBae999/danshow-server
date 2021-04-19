@@ -168,15 +168,16 @@ class VideoControllerTest {
     }
 
 
-    /*
     @Test
     @DisplayName("포스트를 게시하면 포스트의 내용과 동영상, 썸네일을 확인할 수 있다.")
     public void getPostTest() {
 
     }
 
-     */
+    @Test
+    @DisplayName("스트리밍 여부 확인")
+    public void doStramingTest() {
 
-
+    }
 
 }
