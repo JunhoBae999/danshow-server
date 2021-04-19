@@ -2,6 +2,7 @@ package com.danshow.danshowserver.domain.composite;
 
 import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.video.Video;
+import com.danshow.danshowserver.domain.video.post.VideoPost;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +11,10 @@ import javax.persistence.*;
 
 @Getter
 @Entity
-@Table(name = "Member_Video")
+@Table(name = "Member_VideoPost")
 @IdClass(MemberVideoId.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberVideo {
+public class MemberToVideoPost {
 
     @Id
     @ManyToOne
@@ -22,9 +23,10 @@ public class MemberVideo {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "video_id")
-    private Video video;
+    @JoinColumn(name = "video_post_id")
+    private VideoPost videoPost;
 
     private boolean favorite;
     private boolean passed;
+
 }

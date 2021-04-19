@@ -1,9 +1,12 @@
-package com.danshow.danshowserver.domain.video;
+package com.danshow.danshowserver.domain.video.post;
 
 import com.danshow.danshowserver.domain.user.Dancer;
+import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.User;
+import com.danshow.danshowserver.domain.video.Video;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -11,7 +14,9 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Inheritance(strategy = InheritanceType.JOINED)
+@SuperBuilder
+@DiscriminatorColumn(name = "type")
 public class VideoPost {
 
     @Id @GeneratedValue
@@ -22,7 +27,8 @@ public class VideoPost {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(mappedBy = "videoPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="video_id")
     private Video video;
 
     private String title;
@@ -41,6 +47,7 @@ public class VideoPost {
 
     private String type;
 
+    private String song_name;
 
     //연관관계 메서드
     public void addFile(Video video) {
@@ -73,11 +80,7 @@ public class VideoPost {
 
     }
 
-
-
-
-
-
-
-
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

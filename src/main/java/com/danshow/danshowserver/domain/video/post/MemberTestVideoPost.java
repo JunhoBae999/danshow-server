@@ -1,20 +1,19 @@
-package com.danshow.danshowserver.domain.video;
+package com.danshow.danshowserver.domain.video.post;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Getter
-@Table(name = "lecture_video")
+@Table(name = "member_test_video_post")
 @Entity
-@DiscriminatorValue("lecture")
+@DiscriminatorValue("member_test")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LectureVideo extends Video{
-
-
+@SuperBuilder
+public class MemberTestVideoPost extends VideoPost{
 }

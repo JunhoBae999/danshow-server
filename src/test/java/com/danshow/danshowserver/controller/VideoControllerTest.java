@@ -4,15 +4,13 @@ import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.DancerRepository;
 import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.MemberRepository;
-import com.danshow.danshowserver.domain.video.VideoPostRepository;
+import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
