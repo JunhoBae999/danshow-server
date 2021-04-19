@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.controller;
 
+import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
 import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
@@ -20,10 +21,9 @@ public class VideoController {
     private final VideoServiceInterface videoService;
 
     @PostMapping("/api/v1/file")
-    public ResponseEntity fileUpload(@RequestPart("video")  MultipartFile video,
+    public ResponseEntity<String> fileUpload(@RequestPart("video")  MultipartFile video,
                                      @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
                                      @RequestParam("userID") String userId, @RequestPart(value = "thumbnail",required = false) MultipartFile image)  {
-
         try {
             videoService.save(video,videoPostSaveDto,userId,image);
         } catch (Exception e) {
@@ -34,7 +34,9 @@ public class VideoController {
 
     @GetMapping("/api/v1/post/{id}")
     public ResponseEntity<VideoPostResponseDto> getPost(@PathVariable Long id) {
-        return null;
+        VideoPost vp = videoService.getVideoPost(id);
+        VideoPostResponseDto videoPostResponseDto = VideoPostResponseDto.createVideoPostResponseDto(vp);
+        return new ResponseEntity<>(videoPostResponseDto, HttpStatus.OK);
     }
 
 

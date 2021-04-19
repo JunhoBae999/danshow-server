@@ -32,8 +32,12 @@ public class VideoPostResponseDto {
 
     private String type;
 
+    private ImageResponseDto thumbnail;
 
-    public VideoPostResponseDto createVideoPostResponseDto(VideoPost videoPost) {
+    private VideoResponseDto videoResponseDto;
+
+    public static VideoPostResponseDto createVideoPostResponseDto(VideoPost videoPost) {
+
         VideoPostResponseDto videoPostResponseDto = new VideoPostResponseDto();
 
         videoPostResponseDto.id = videoPost.getId();
@@ -46,6 +50,8 @@ public class VideoPostResponseDto {
         videoPostResponseDto.songName = videoPost.getSongName();
         videoPostResponseDto.title = videoPost.getTitle();
         videoPostResponseDto.type = videoPost.getType();
+        videoPostResponseDto.thumbnail = new ImageResponseDto(videoPost.getImage());
+        videoPostResponseDto.videoResponseDto = new VideoResponseDto(videoPost.getVideo());
 
         return videoPostResponseDto;
     }
