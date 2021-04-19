@@ -180,4 +180,10 @@ class VideoControllerTest {
 
     }
 
+    @Test
+    @DisplayName("s3 유틸 여부 확인")
+    public void doUtilCheck() {
+
+    }
+
 }
