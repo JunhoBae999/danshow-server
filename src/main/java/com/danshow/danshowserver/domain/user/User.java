@@ -1,17 +1,15 @@
 package com.danshow.danshowserver.domain.user;
 
 import com.danshow.danshowserver.domain.BaseTimeEntity;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
+@Setter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn(name = "DTYPE")
+@DiscriminatorColumn(name = "DTYPE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
@@ -29,23 +27,10 @@ public class User extends BaseTimeEntity {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @Column
-    private String dType;
-
-    public User(String email, String nickname, String name, String dType) {
+    public User(String email, String nickname, String name) {
        this.email = email;
        this.nickname = nickname;
        this.name = name;
-       this.dType = dType;
     }
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private Member member;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private Dancer dancer;
-
 
 }

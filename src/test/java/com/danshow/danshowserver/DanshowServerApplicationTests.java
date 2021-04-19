@@ -8,8 +8,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootTest
 class DanshowServerApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
-
 }

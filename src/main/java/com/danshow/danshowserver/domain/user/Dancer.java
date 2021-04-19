@@ -1,31 +1,35 @@
 package com.danshow.danshowserver.domain.user;
 
 import com.danshow.danshowserver.domain.crew.Crew;
-import com.danshow.danshowserver.domain.video.Video;
+import com.danshow.danshowserver.domain.video.post.VideoPost;
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
-//@DiscriminatorValue("Dancer")
+@DiscriminatorValue("Dancer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Dancer extends User {
 
     private String dancer_description;
     private String dancer_picture;
 
-    @OneToMany(mappedBy = "dancer")
-    private List<Video> videoList = new ArrayList<Video>();
+    @OneToMany(mappedBy = "user")
+    private List<VideoPost> videoList = new ArrayList<VideoPost>();
 
-    public void addVideo (Video video) {
-        this.videoList.add(video);
+    public void addVideoPost (VideoPost videoPost) {
+        this.videoList.add(videoPost);
         //무한루프 방지
-        if(video.getDancer() != this) {
-            video.setDancer(this);
+        if(videoPost.getUser() != this) {
+            //TODO : 테스트 필
+            videoPost.setUser(this);
         }
     }
 
@@ -35,7 +39,7 @@ public class Dancer extends User {
     @Builder
     public Dancer(String email, String nickname, String name,
                   String dancer_description, String dancer_picture){
-        super(email,nickname,name,"Dancer");
+        super(email,nickname,name);
         this.dancer_description = dancer_description;
         this.dancer_picture = dancer_picture;
     }

@@ -1,10 +1,8 @@
 package com.danshow.danshowserver.domain.comment;
 
 import com.danshow.danshowserver.domain.BaseTimeEntity;
-import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.Member;
-import com.danshow.danshowserver.domain.video.CoverVideo;
-import com.danshow.danshowserver.domain.video.Video;
+import com.danshow.danshowserver.domain.video.post.CoverVideoPost;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,14 +29,18 @@ public class Comment extends BaseTimeEntity {
     /*멤버 쪽에선 자기가 단 코멘트 조회 안해도 될거 같아 단방향으로 했습니다*/
 
     @ManyToOne
-    @JoinColumn(name = "video_id")
-    private CoverVideo coverVideo;
+    @JoinColumn(name = "video_post_id")
+    private CoverVideoPost coverVideoPost;
 
-    public void setComment(CoverVideo coverVideo) {
-        this.coverVideo = coverVideo;
+    public void setComment(CoverVideoPost coverVideoPost) {
+        this.coverVideoPost = coverVideoPost;
         //무한루프 방지
-        if(!coverVideo.getCommentList().contains(this)) {
-            coverVideo.getCommentList().add(this);
+        if(!coverVideoPost.getCommentList().contains(this)) {
+            coverVideoPost.getCommentList().add(this);
         }
+    }
+
+    public void setCoverVideoPost(CoverVideoPost coverVideoPost) {
+        this.coverVideoPost = coverVideoPost;
     }
 }

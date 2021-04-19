@@ -3,7 +3,6 @@ package com.danshow.danshowserver.domain.crew;
 import com.danshow.danshowserver.domain.BaseTimeEntity;
 import com.danshow.danshowserver.domain.composite.MemberCrew;
 import com.danshow.danshowserver.domain.user.Dancer;
-import com.danshow.danshowserver.domain.user.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
