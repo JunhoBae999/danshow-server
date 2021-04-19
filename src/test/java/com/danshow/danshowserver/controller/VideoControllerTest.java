@@ -181,7 +181,7 @@ class VideoControllerTest {
     }
 
     @Test
-    @DisplayName("s3 유틸 여부 확인")
+    @DisplayName("s3 유틸 여부 변경")
     public void doUtilCheck() {
 
     }
