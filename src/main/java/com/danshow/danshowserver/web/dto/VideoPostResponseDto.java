@@ -30,7 +30,6 @@ public class VideoPostResponseDto {
 
     private String title;
 
-    private String type;
 
     private ImageResponseDto thumbnail;
 
@@ -49,7 +48,7 @@ public class VideoPostResponseDto {
         videoPostResponseDto.length = videoPost.getLength();
         videoPostResponseDto.songName = videoPost.getSongName();
         videoPostResponseDto.title = videoPost.getTitle();
-        videoPostResponseDto.type = videoPost.getType();
+
         videoPostResponseDto.thumbnail = new ImageResponseDto(videoPost.getImage());
         videoPostResponseDto.videoResponseDto = new VideoResponseDto(videoPost.getVideo());
 

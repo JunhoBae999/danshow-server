@@ -25,11 +25,11 @@ public class VideoPost {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="video_id")
     private AttachFile video;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="image_id")
     private AttachFile image;
 
@@ -46,8 +46,6 @@ public class VideoPost {
     private Long click = 0L;
 
     private Long length;
-
-    private String type;
 
     private String songName;
 
@@ -74,13 +72,12 @@ public class VideoPost {
         videoPost.genre = videoPostSaveDto.getGenre();
         videoPost.length = videoPostSaveDto.getLength();
         videoPost.difficulty = videoPost.getDifficulty();
-        videoPost.type = videoPostSaveDto.getType();
         videoPost.video = requestVideo;
 
         requestVideo.setVideoPost(videoPost);
         requestVideo.setUser(user);
 
-        requestImage.setVideoPost(videoPost);
+        requestImage.setPostImage(videoPost);
 
         return videoPost;
 

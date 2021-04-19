@@ -10,6 +10,10 @@ import com.danshow.danshowserver.domain.video.FileRepository;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +40,7 @@ public class VideoServiceImplLocal implements VideoServiceInterface {
         AttachFile uploadedVideo = uploadFile(video);
         AttachFile uploadImage = uploadFile(image);
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage);
-
+        videoPostRepository.save(videoPost);
     }
 
     public AttachFile uploadFile(MultipartFile video) throws IOException {
@@ -66,11 +70,15 @@ public class VideoServiceImplLocal implements VideoServiceInterface {
 
     private AttachFile getAttachFile(MultipartFile video, String originalFilename, String filename, String filePath) throws IOException {
         video.transferTo(new File(filePath));
+
         AttachFile savedFile = AttachFile.builder()
                     .filename(filename)
                     .filePath(filePath)
                     .originalFileName(originalFilename)
                     .build();
+
+        System.out.println("here!");
+        System.out.println(originalFilename);
         return savedFile;
     }
 
@@ -83,6 +91,26 @@ public class VideoServiceImplLocal implements VideoServiceInterface {
     public VideoPost getVideoPost(Long id) {
         //TODO : 에러 익셉션 처리 필요
         return (VideoPost) videoPostRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) throws IOException{
+
+        final long chunkSize = 1000000L;
+        long contentLength = video.contentLength();
+
+        HttpRange httpRange = headers.getRange().stream().findFirst().get();
+        if(httpRange != null) {
+            long start = httpRange.getRangeStart(contentLength);
+            long end = httpRange.getRangeEnd(contentLength);
+            long ragneLength = Long.min(chunkSize,end-start+1);
+            return new ResourceRegion(video,start,ragneLength);
+        }else {
+            long rangeLength = Long.min(chunkSize,contentLength);
+            return new ResourceRegion(video,0,rangeLength);
+        }
+
+
     }
 
 

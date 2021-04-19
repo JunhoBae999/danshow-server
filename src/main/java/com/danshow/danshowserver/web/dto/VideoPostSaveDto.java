@@ -23,6 +23,5 @@ public class VideoPostSaveDto {
 
     private Long length;
 
-    private String type;
 
 }

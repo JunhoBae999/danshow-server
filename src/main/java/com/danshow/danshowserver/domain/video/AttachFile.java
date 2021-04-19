@@ -42,6 +42,11 @@ public class AttachFile extends BaseTimeEntity {
         videoPost.setVideo(this);
     }
 
+    public void setPostImage(VideoPost videoPost){
+        this.videoPost = videoPost;
+        videoPost.setImage(this);
+    }
+
     public void setUser(User user) {
         this.user = user;
     }

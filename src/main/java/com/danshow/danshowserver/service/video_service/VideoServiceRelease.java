@@ -5,6 +5,9 @@ import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,6 +70,11 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     @Override
     public VideoPost getVideoPost(Long id) {
+        return null;
+    }
+
+    @Override
+    public ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) {
         return null;
     }
 }

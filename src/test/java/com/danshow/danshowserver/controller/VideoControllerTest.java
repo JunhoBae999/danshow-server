@@ -9,9 +9,7 @@ import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.aspectj.util.FileUtil;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,10 +20,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@Rollback(value = false)
 class VideoControllerTest {
 
     @Autowired
@@ -60,7 +62,7 @@ class VideoControllerTest {
     ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp() {
+    public  void setUp() {
 
         Member member = Member.builder()
                 .membership(true)
@@ -82,6 +84,7 @@ class VideoControllerTest {
 
     }
 
+
     @Test
     @DisplayName("안무가가 영상과 포스팅을 함께 올리는 경우 테스")
     public void videoUploadTest() throws Exception {
@@ -98,9 +101,9 @@ class VideoControllerTest {
                 "image test".getBytes(StandardCharsets.UTF_8));
 
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
-                1L,"idol","boy",1L,"lecture"));
+                1L, "idol", "boy", 1L));
 
-        MockMultipartFile json = new MockMultipartFile("post","video_post","application/json",videoPostContent.getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile json = new MockMultipartFile("post", "video_post", "application/json", videoPostContent.getBytes(StandardCharsets.UTF_8));
 
         MvcResult result = this.mockMvc.perform(multipart("/api/v1/file")
                 .file(video)
@@ -118,8 +121,8 @@ class VideoControllerTest {
 
         System.out.println("=====resonse content======");
         System.out.println(output);
-
     }
+
 
     @Test
     @DisplayName("로컬의 demofile 폴더의 woman, fuck 파일을 전송하여 filespath 폴더로 옮기고 디비에 저장한다.")
@@ -143,7 +146,7 @@ class VideoControllerTest {
                 Files.readAllBytes(realImage.getFile().toPath()));
 
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
-                1L,"idol","boy",1L,"lecture"));
+                1L,"idol","boy",1L));
 
         MockMultipartFile json = new MockMultipartFile("post","video_post","application/json",videoPostContent.getBytes(StandardCharsets.UTF_8));
 
@@ -160,21 +163,19 @@ class VideoControllerTest {
                 .andReturn();
 
         String output = result.getResponse().getContentAsString();
-
         System.out.println("=====resonse content======");
         System.out.println(output);
-
-
     }
 
 
-
-
+    /*
     @Test
     @DisplayName("포스트를 게시하면 포스트의 내용과 동영상, 썸네일을 확인할 수 있다.")
     public void getPostTest() {
 
     }
+
+     */
 
 
 
