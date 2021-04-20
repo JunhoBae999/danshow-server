@@ -28,7 +28,7 @@ public class VideoController {
 
     private final VideoServiceInterface videoService;
 
-    @ApiOperation(value = "비디오 포스트 업로드",notes = "비디오, 비디오 포스트 요청 객체, 유저, 썸네일 이미지를 받아 업로드합니다.")
+    @ApiOperation(value = "Upload Video Post",notes = "Request with Video file, Video post request object, User, Thumbnail image to create post")
     @PostMapping("/api/v1/file")
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
                                      @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
@@ -41,7 +41,7 @@ public class VideoController {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
-    @ApiOperation(value = "비디오 포스트 조회", notes = "비디오 포스트를 조회합니다.")
+    @ApiOperation(value = "Get Video Post", notes = "Get Video Post By Id")
     @GetMapping("/api/v1/post/{id}")
     public ResponseEntity<VideoPostResponseDto> getPost(@ApiParam(value = "포스트 식별")@PathVariable Long id) {
         VideoPost vp = videoService.getVideoPost(id);
@@ -49,8 +49,15 @@ public class VideoController {
         return new ResponseEntity<>(videoPostResponseDto, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Delete Video Post", notes = "delete video post only if user")
+    @PostMapping("/api/v1/post/{id}/delete")
+    public ResponseEntity deletePost(@ApiParam(value = "post id") @PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
-    @ApiOperation(value = "비디오 스트리밍", notes = "용량이 큰 비디오를 스트리밍 합니다. bytes 나누어 전송합니다.")
+
+
+    @ApiOperation(value = "Video Streaming", notes = "Stream the Video with Big size as bytes array.")
     @GetMapping("/api/v1/videos/{id}")
     public ResponseEntity<ResourceRegion> getVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @RequestHeader HttpHeaders headers) throws IOException {
 
@@ -65,7 +72,7 @@ public class VideoController {
                 .body(region);
     }
 
-    @ApiOperation(value = "비디오 전체 스트리밍" , notes = "용량이 작은 비디오를 한번에 응답합니다.")
+    @ApiOperation(value = "Video Straming Totally" , notes = "Stream the Video with small size as array")
     @GetMapping("/api/v1/videos/{id}/full")
     public ResponseEntity<UrlResource> getFullVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id) throws MalformedURLException {
         AttachFile video = videoService.getVideo(id);

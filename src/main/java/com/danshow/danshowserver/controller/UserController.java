@@ -23,14 +23,14 @@ public class UserController {
     private final MemberService memberService;
     private final DancerService dancerService;
 
-    @ApiOperation(value = "멤버 업데이트" , notes = "멤버의 정보를 업데이트 합니다.")
+    @ApiOperation(value = "Update Member" , notes = "Member can update the profile")
     @PostMapping("user/member-update")
     public ResponseEntity memberUpdate(@RequestBody MemberUpdateRequestDto updateRequestDto) {
         memberService.update(updateRequestDto);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
-    @ApiOperation(value = "멤버 전환",notes = "멤버를 안무가로 전환합니다.")
+    @ApiOperation(value = "To Dancer",notes = "Change the type of user - member to dancer")
     @PostMapping("user/member-to-dancer")
     public ResponseEntity memberToDancer(@RequestParam String email) {
         Long result = memberService.toDancer(email);
@@ -39,7 +39,7 @@ public class UserController {
         return new ResponseEntity<>("already dancer", HttpStatus.ACCEPTED);
     }
 
-    @ApiOperation(value = "안무가 업데이트",notes = "안무가의 정보를 업데이트합니다.")
+    @ApiOperation(value = "Update Dancer",notes = "Update the profile of dancer")
     @PostMapping("user/dancer-update")
     public ResponseEntity dancerUpdate(@RequestBody DancerUpdateRequestDto updateRequestDto) {
         dancerService.update(updateRequestDto);
