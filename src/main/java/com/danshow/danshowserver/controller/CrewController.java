@@ -17,7 +17,6 @@ public class CrewController {
     @ApiOperation(value = "Create Crew", notes = "Create Crew by Dancer")
     @PostMapping("/api/v1/create_crew")
     public void createCrew() {
-
     }
 
     @ApiOperation(value = "delete Crew", notes = "delete Crew by Dancer")
