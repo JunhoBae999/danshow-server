@@ -2,13 +2,16 @@ package com.danshow.danshowserver.service;
 
 import com.danshow.danshowserver.config.auth.dto.SessionUser;
 import com.danshow.danshowserver.domain.user.*;
-import com.danshow.danshowserver.web.dto.MemberSaveRequestDto;
-import com.danshow.danshowserver.web.dto.MemberUpdateRequestDto;
+import com.danshow.danshowserver.web.dto.user.MemberResponseDto;
+import com.danshow.danshowserver.web.dto.user.MemberSaveRequestDto;
+import com.danshow.danshowserver.web.dto.user.MemberUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -56,6 +59,34 @@ public class MemberService {
             return dancer.getId();
         } catch (Exception e){
             return -1L;
+        }
+
+    }
+
+    @Transactional
+    public MemberResponseDto findById(Long id) {
+        User user = (User) userRepository.findById(id).orElse(null);
+        if(user == null) {
+            return MemberResponseDto.builder().build();
+        } else if(user instanceof Member) {
+            Member member = (Member) memberRepository.findById(id).orElse(null);
+            return MemberResponseDto.builder()
+                    .email(member.getEmail())
+                    .name(member.getName())
+                    .nickname(member.getNickname())
+                    .membership(member.getMembership())
+                    .profile_description(member.getProfile_description())
+                    .profile_picture(member.getProfile_picture())
+                    .build();
+        } else {
+            Dancer dancer = (Dancer) dancerRepository.findById(id).orElse(null);
+            return MemberResponseDto.builder()
+                    .email(dancer.getEmail())
+                    .name(dancer.getName())
+                    .nickname(dancer.getNickname())
+                    .profile_description(dancer.getDancer_description())
+                    .profile_picture(dancer.getDancer_picture())
+                    .build();
         }
 
     }
