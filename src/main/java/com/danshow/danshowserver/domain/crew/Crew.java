@@ -3,15 +3,14 @@ package com.danshow.danshowserver.domain.crew;
 import com.danshow.danshowserver.domain.BaseTimeEntity;
 import com.danshow.danshowserver.domain.composite.MemberCrew;
 import com.danshow.danshowserver.domain.user.Dancer;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Getter
 @Entity
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseTimeEntity {
 
@@ -29,5 +28,12 @@ public class Crew extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "crew")
     private List<MemberCrew> memberCrewList;
+
+    @Builder
+    public Crew(String description,String crew_profile_image, Dancer dancer) {
+        this.description = description;
+        this.crew_profile_image = crew_profile_image;
+        this.dancer = dancer;
+    }
 
 }
