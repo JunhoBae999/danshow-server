@@ -1,4 +1,4 @@
-package com.danshow.danshowserver.web.dto;
+package com.danshow.danshowserver.web.dto.user;
 
 import com.danshow.danshowserver.domain.user.Dancer;
 import lombok.Builder;

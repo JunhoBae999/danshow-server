@@ -1,8 +1,8 @@
 package com.danshow.danshowserver.service;
 
 import com.danshow.danshowserver.domain.user.*;
-import com.danshow.danshowserver.web.dto.MemberSaveRequestDto;
-import com.danshow.danshowserver.web.dto.MemberUpdateRequestDto;
+import com.danshow.danshowserver.web.dto.user.MemberSaveRequestDto;
+import com.danshow.danshowserver.web.dto.user.MemberUpdateRequestDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
