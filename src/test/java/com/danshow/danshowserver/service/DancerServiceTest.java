@@ -2,8 +2,7 @@ package com.danshow.danshowserver.service;
 
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.DancerRepository;
-import com.danshow.danshowserver.web.dto.DancerUpdateRequestDto;
-import org.assertj.core.api.AbstractBigDecimalAssert;
+import com.danshow.danshowserver.web.dto.user.DancerUpdateRequestDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
