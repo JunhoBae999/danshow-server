@@ -1,10 +1,12 @@
 package com.danshow.danshowserver.config.auth.dto;
 
 import com.danshow.danshowserver.domain.user.Member;
+import com.danshow.danshowserver.domain.user.Role;
 import lombok.Getter;
 
 import java.util.Map;
 
+//TODO 이제 안씀
 @Getter
 public class OAuthAttributes {
 
@@ -25,6 +27,7 @@ public class OAuthAttributes {
                 .email(this.email)
                 .nickname("nickname")
                 .name(this.name)
+                .role(Role.GUEST)
                 .membership(Boolean.FALSE)
                 .profile_description("No description")
                 .profile_picture(this.picture)
