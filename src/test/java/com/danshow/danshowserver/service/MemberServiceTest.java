@@ -53,9 +53,8 @@ public class MemberServiceTest {
     @Test
     public void memberUpdateTest() {
         //given
-        MemberUpdateRequestDto memberUpdateRequestDto = new MemberUpdateRequestDto("abc@a.com",
-                "new_nickname",true,null);
-        memberService.update(memberUpdateRequestDto);
+        MemberUpdateRequestDto memberUpdateRequestDto = new MemberUpdateRequestDto("new_nickname",true,null);
+        memberService.update(memberUpdateRequestDto, "abc@a.com");
 
         //when
         Member member = memberRepository.findByEmail("abc@a.com");
