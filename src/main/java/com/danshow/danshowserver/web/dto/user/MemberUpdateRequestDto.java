@@ -8,16 +8,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class MemberUpdateRequestDto {
-    private String email;
     private String nickname;
     private Boolean membership;
     private String profile_description;
     //private String profile_picture;
 
     @Builder
-    public MemberUpdateRequestDto(String email, String nickname, Boolean membership,
-                                  String profile_description) {
-        this.email = email;
+    public MemberUpdateRequestDto(String nickname, Boolean membership, String profile_description) {
         this.nickname = nickname;
         this.membership = membership;
         this.profile_description = profile_description;
