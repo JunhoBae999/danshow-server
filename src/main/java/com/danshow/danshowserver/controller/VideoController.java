@@ -56,7 +56,6 @@ public class VideoController {
     }
 
 
-
     @ApiOperation(value = "Video Streaming", notes = "Stream the Video with Big size as bytes array.")
     @GetMapping("/api/v1/videos/{id}")
     public ResponseEntity<ResourceRegion> getVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @RequestHeader HttpHeaders headers) throws IOException {
@@ -72,16 +71,22 @@ public class VideoController {
                 .body(region);
     }
 
-    @ApiOperation(value = "Video Straming Totally" , notes = "Stream the Video with small size as array")
+    @ApiOperation(value = "Video Streaming Totally" , notes = "Stream the Video with small size as array")
     @GetMapping("/api/v1/videos/{id}/full")
     public ResponseEntity<UrlResource> getFullVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id) throws MalformedURLException {
+
         AttachFile video = videoService.getVideo(id);
 
         UrlResource resVideo = new UrlResource(video.getFilePath());
+
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .contentType(MediaTypeFactory.getMediaType(resVideo).orElse(MediaType.APPLICATION_OCTET_STREAM))
                 .body(resVideo);
     }
+
+
+
+
 
 
 }

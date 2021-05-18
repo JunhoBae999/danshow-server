@@ -109,9 +109,9 @@ public class VideoServiceImplLocal implements VideoServiceInterface {
             long rangeLength = Long.min(chunkSize,contentLength);
             return new ResourceRegion(video,0,rangeLength);
         }
-
-
     }
+
+
 
 
 }
