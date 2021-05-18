@@ -8,12 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class DancerUpdateRequestDto {
-    private String email;
     private String dancer_description;
 
     @Builder
-    public DancerUpdateRequestDto(String email, String dancer_description) {
-        this.email = email;
+    public DancerUpdateRequestDto(String dancer_description) {
         this.dancer_description = dancer_description;
     }
 

@@ -2,6 +2,7 @@ package com.danshow.danshowserver.service;
 
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.DancerRepository;
+import com.danshow.danshowserver.domain.user.Role;
 import com.danshow.danshowserver.web.dto.user.DancerUpdateRequestDto;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ public class DancerServiceTest {
                 .email("abc@a.com")
                 .nickname("nickname")
                 .name("name")
+                .role(Role.DANCER)
                 .dancer_description("No description")
                 .dancer_picture("picture url")
                 .build());
@@ -36,8 +38,7 @@ public class DancerServiceTest {
     public void dancerUpdate() {
         //given
         dancerService.update(DancerUpdateRequestDto.builder()
-                .email("abc@a.com")
-                .dancer_description("New description").build());
+                .dancer_description("New description").build(),"abc@a.com");
         //when
         Dancer dancer = dancerRepository.findByEmail("abc@a.com");
 

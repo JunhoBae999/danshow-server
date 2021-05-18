@@ -1,6 +1,7 @@
 package com.danshow.danshowserver.web.dto.user;
 
 import com.danshow.danshowserver.domain.user.Member;
+import com.danshow.danshowserver.domain.user.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class MemberSaveRequestDto {
                 .nickname(nickname)
                 .name(name)
                 .membership(membership)
+                .role(Role.GUEST)
                 .profile_description(profile_description)
                 .profile_picture(profile_picture)
                 .build();
