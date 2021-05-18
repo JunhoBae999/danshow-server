@@ -1,4 +1,4 @@
-package com.danshow.danshowserver.config.auth;
+package com.danshow.danshowserver.config.auth.custom;
 
 import com.danshow.danshowserver.config.auth.dto.OAuthAttributes;
 import com.danshow.danshowserver.config.auth.dto.SessionUser;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
 
+//TODO 이제 안씀
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -36,15 +37,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
         OAuthAttributes attributes = new OAuthAttributes(oAuth2User.getAttributes());
-
-        /*TODO 프린트 빼기*/
-        System.out.println("attributes = " + attributes);
-
         User user = saveOrUpdate(attributes);
-        httpSession.setAttribute("user",new SessionUser(user));
+        //httpSession.setAttribute("user",new SessionUser(user));
 
-        /*권한 설정 아직 안했음*/
-        return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority("USER")),
+        return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
                 attributes.getAttributes(),
                 "sub"); //구글만 할거라서 sub로 고정
     }

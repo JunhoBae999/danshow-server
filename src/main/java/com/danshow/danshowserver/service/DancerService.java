@@ -18,13 +18,9 @@ public class DancerService {
     private final DancerRepository dancerRepository;
 
     @Transactional
-    public Long update(DancerUpdateRequestDto requestDto) {
+    public Long update(DancerUpdateRequestDto requestDto, String email) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        Dancer dancer;
-        if(sessionUser == null) //only for testing
-            dancer = dancerRepository.findByEmail(requestDto.getEmail());
-        else
-            dancer = dancerRepository.findByEmail(sessionUser.getEmail());
+        Dancer dancer = dancerRepository.findByEmail(email);
         dancer = requestDto.toEntity(dancer); //update
         return dancer.getId();
     }

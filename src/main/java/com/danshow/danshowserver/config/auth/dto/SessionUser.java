@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+//TODO 이제 안씀
 @Setter
 @Getter
 @NoArgsConstructor

@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.controller;
 
+import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.service.CrewService;
 import com.danshow.danshowserver.web.dto.crew.CrewResponseDto;
 import com.danshow.danshowserver.web.dto.crew.CrewSaveRequestDto;
@@ -18,18 +19,21 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CrewController {
     private final CrewService crewService;
+    private final TokenProvider tokenProvider;
 
     @ApiOperation(value = "크루 생성" , notes = "댄서가 크루를 생성합니다.")
     @PostMapping("crew/save")
-    public ResponseEntity<String> crewSave(@RequestBody CrewSaveRequestDto crewSaveRequestDto) {
-        crewService.save(crewSaveRequestDto);
+    public ResponseEntity<String> crewSave(@RequestBody CrewSaveRequestDto crewSaveRequestDto,
+                                           @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+        crewService.save(crewSaveRequestDto, tokenProvider.getUserPk(Jwt));
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
     @ApiOperation(value = "크루 업데이트" , notes = "댄서가 관리하는 크루를 업데이트 합니다.")
     @PostMapping("crew/update")
-    public ResponseEntity<String> crewUpdate(@RequestBody CrewSaveRequestDto crewSaveRequestDto) {
-        crewService.update(crewSaveRequestDto);
+    public ResponseEntity<String> crewUpdate(@RequestBody CrewSaveRequestDto crewSaveRequestDto,
+                                             @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+        crewService.update(crewSaveRequestDto,tokenProvider.getUserPk(Jwt));
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 

@@ -1,11 +1,13 @@
 package com.danshow.danshowserver.controller;
 
+import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.service.DancerService;
 import com.danshow.danshowserver.service.MemberService;
 import com.danshow.danshowserver.web.dto.user.DancerUpdateRequestDto;
 import com.danshow.danshowserver.web.dto.user.MemberResponseDto;
 import com.danshow.danshowserver.web.dto.user.MemberUpdateRequestDto;
+import com.danshow.danshowserver.web.dto.user.OAuthResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Api(tags = {"1.User"})
 @Slf4j
 @RestController
@@ -22,17 +26,29 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final MemberService memberService;
     private final DancerService dancerService;
+    private final TokenProvider tokenProvider;
+
+    @ApiOperation(value = "로그인" , notes = "구글api 액세스 토큰으로 로그인(회원가입) 합니다")
+    @PostMapping("user/login")
+    public ResponseEntity<String> login(@ApiParam(value = "액세스 토큰", required = true) @RequestBody String access_token) {
+        String Jwt = memberService.login(access_token);
+        return new ResponseEntity<>(Jwt, HttpStatus.OK); //TODO 액세스 토큰이 유효하지 않을 때 리스폰을 어떻게할까
+    }
+
 
     @ApiOperation(value = "Update Member" , notes = "Member can update the profile")
     @PostMapping("user/member-update")
-    public ResponseEntity<String> memberUpdate(@RequestBody MemberUpdateRequestDto updateRequestDto) {
-        memberService.update(updateRequestDto);
+    public ResponseEntity<String> memberUpdate(@ApiParam(value = "수정 할 정보", required = false) @RequestBody MemberUpdateRequestDto updateRequestDto,
+                                               @ApiParam(required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+        String email = tokenProvider.getUserPk(Jwt);
+        memberService.update(updateRequestDto, email);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
     @ApiOperation(value = "To Dancer",notes = "Change the type of user - member to dancer")
     @PostMapping("user/member-to-dancer")
-    public ResponseEntity<String> memberToDancer(@RequestParam String email) {
+    public ResponseEntity<String> memberToDancer(@ApiParam(required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+        String email = tokenProvider.getUserPk(Jwt);
         Long result = memberService.toDancer(email);
         if(result>=0)
             return new ResponseEntity<>("success", HttpStatus.OK);
@@ -41,8 +57,10 @@ public class UserController {
 
     @ApiOperation(value = "Update Dancer",notes = "Update the profile of dancer")
     @PostMapping("user/dancer-update")
-    public ResponseEntity<String> dancerUpdate(@RequestBody DancerUpdateRequestDto updateRequestDto) {
-        dancerService.update(updateRequestDto);
+    public ResponseEntity<String> dancerUpdate(@RequestBody DancerUpdateRequestDto updateRequestDto,
+                                               @ApiParam(required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+        String email = tokenProvider.getUserPk(Jwt);
+        dancerService.update(updateRequestDto, email);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
