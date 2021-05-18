@@ -1,7 +1,6 @@
 package com.danshow.danshowserver.domain.user;
 
 import com.danshow.danshowserver.domain.composite.MemberCrew;
-import com.danshow.danshowserver.domain.composite.MemberToVideoPost;
 import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
 import lombok.*;
 
@@ -32,18 +31,22 @@ public class Member extends User {
     @OneToMany(mappedBy = "user")
     private List<MemberTestVideoPost> memberTestVideoList = new ArrayList<MemberTestVideoPost>();
 
+    @OneToMany(mappedBy = "member")
+    private List<MemberCrew> crewList = new ArrayList<MemberCrew>();
 
     public void addVideo (MemberTestVideoPost memberTestVideo) {
         this.memberTestVideoList.add(memberTestVideo);
-        //무한루프 방지
         if(memberTestVideo.getUser() != this) {
             memberTestVideo.setUser(this);
         }
     }
 
-    @OneToMany(mappedBy = "member")
-    private List<MemberCrew> memberCrewList;
+    public void addCrew (MemberCrew crew) {
+        this.crewList.add(crew);
+        if(crew.getMember() != this) {
+            crew.setMember(this);
+        }
+    }
 
-    @OneToMany(mappedBy = "member")
-    private List<MemberToVideoPost> memberVideoList;
+
 }

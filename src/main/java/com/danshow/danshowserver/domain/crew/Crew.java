@@ -27,7 +27,14 @@ public class Crew extends BaseTimeEntity {
     private Dancer dancer;
 
     @OneToMany(mappedBy = "crew")
-    private List<MemberCrew> memberCrewList;
+    private List<MemberCrew> memberList;
+
+    public void addMember(MemberCrew member) {
+        this.memberList.add(member);
+        if(member.getCrew() != this) {
+            member.setCrew(this);
+        }
+    }
 
     @Builder
     public Crew(String description,String crew_profile_image, Dancer dancer) {

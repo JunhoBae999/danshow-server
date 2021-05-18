@@ -23,20 +23,17 @@ public class CrewService {
     private final CrewRepository crewRepository;
 
     @Transactional
-    public void save(CrewSaveRequestDto crewSaveRequestDto) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+    public void save(CrewSaveRequestDto crewSaveRequestDto, String email) {
 
         crewRepository.save(Crew.builder()
                 .description(crewSaveRequestDto.getDescription())
                 .crew_profile_image(crewSaveRequestDto.getImage_url())
-                .dancer(dancerRepository.findByEmail(sessionUser.getEmail())).build());
+                .dancer(dancerRepository.findByEmail(email)).build());
     }
 
     @Transactional
-    public void update(CrewSaveRequestDto crewSaveRequestDto) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        Crew crew = crewRepository.findByDancer(dancerRepository.findByEmail(sessionUser.getEmail()));
-
+    public void update(CrewSaveRequestDto crewSaveRequestDto, String email) {
+        Crew crew = crewRepository.findByDancer(dancerRepository.findByEmail(email));
         crew.setCrew_profile_image(crewSaveRequestDto.getImage_url());
         crew.setDescription(crewSaveRequestDto.getDescription());
     }
