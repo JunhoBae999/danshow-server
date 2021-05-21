@@ -19,6 +19,7 @@ public class Crew extends BaseTimeEntity {
     @Column(name = "crew_id")
     private Long id;
 
+    private String title;
     private String description;
     private String crew_profile_image;
 
@@ -37,7 +38,8 @@ public class Crew extends BaseTimeEntity {
     }
 
     @Builder
-    public Crew(String description,String crew_profile_image, Dancer dancer) {
+    public Crew(String title, String description,String crew_profile_image, Dancer dancer) {
+        this.title = title;
         this.description = description;
         this.crew_profile_image = crew_profile_image;
         this.dancer = dancer;
