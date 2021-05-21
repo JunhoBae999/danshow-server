@@ -1,9 +1,6 @@
 package com.danshow.danshowserver.controller;
 
-import com.danshow.danshowserver.domain.user.Dancer;
-import com.danshow.danshowserver.domain.user.DancerRepository;
-import com.danshow.danshowserver.domain.user.Member;
-import com.danshow.danshowserver.domain.user.MemberRepository;
+import com.danshow.danshowserver.domain.user.*;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,6 +66,7 @@ class VideoControllerTest {
                 .email("test.test@test.test")
                 .nickname("tester")
                 .name("testjunho")
+                .role(Role.MEMBER)
                 .build();
 
         memberRepository.save(member);
@@ -78,6 +76,7 @@ class VideoControllerTest {
                 .email("dancer_test@test.test")
                 .nickname("testdencer")
                 .name("testerdancer")
+                .role(Role.DANCER)
                 .build();
 
         dancerRepository.save(dancer);

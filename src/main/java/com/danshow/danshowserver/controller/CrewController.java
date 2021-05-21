@@ -2,6 +2,7 @@ package com.danshow.danshowserver.controller;
 
 import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.service.CrewService;
+import com.danshow.danshowserver.web.dto.Thumbnail;
 import com.danshow.danshowserver.web.dto.crew.CrewResponseDto;
 import com.danshow.danshowserver.web.dto.crew.CrewSaveRequestDto;
 import io.swagger.annotations.Api;
@@ -12,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Api(tags = {"3.Crew"})
 @Slf4j
@@ -43,4 +46,8 @@ public class CrewController {
         return new ResponseEntity<>(crewService.findById(id), HttpStatus.OK);
     }
 
+    @GetMapping("crew/main")
+    public ResponseEntity<List<Thumbnail>> crewMain() {
+        return new ResponseEntity<>(crewService.crewMainList(), HttpStatus.OK);
+    }
 }
