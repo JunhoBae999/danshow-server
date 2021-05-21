@@ -29,7 +29,7 @@ public class Comment extends BaseTimeEntity {
     /*멤버 쪽에선 자기가 단 코멘트 조회 안해도 될거 같아 단방향으로 했습니다*/
 
     @ManyToOne
-    @JoinColumn(name = "video_post_id")
+    @JoinColumn(name ="video_post_id")
     private CoverVideoPost coverVideoPost;
 
     public void setComment(CoverVideoPost coverVideoPost) {

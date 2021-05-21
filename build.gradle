@@ -24,7 +24,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'junit:junit:4.12'
-    implementation 'net,bramp.ffmpeg:ffmpeg:0.6.2'
+    implementation 'net.bramp.ffmpeg:ffmpeg:0.6.2'
+    implementation 'org.projectlombok:lombok:1.18.16'
     compile group: 'net.bramp.ffmpeg', name: 'ffmpeg', version: '0.6.2'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
@@ -38,6 +39,8 @@ dependencies {
     testCompile("junit:junit:4.12")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
+
 }
 
 test {

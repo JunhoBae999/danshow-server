@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@Table(name = "Member_crew")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberCrew {
