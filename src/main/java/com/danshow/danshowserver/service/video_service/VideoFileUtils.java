@@ -65,12 +65,14 @@ public class VideoFileUtils {
 
             log.info("output path : " + fileJoinPath);
 
+            String totalPath = fileJoinPath + "/"+originalFileNameWithoutExtension+"_"+i+".mp4";
+
             FFmpegBuilder builder = new FFmpegBuilder()
                     .overrideOutputFiles(true)
                     .addInput(inputPath)
                     .addExtraArgs("-ss", String.valueOf(startPoint))
                     .addExtraArgs("-t", String.valueOf(streamSize))
-                    .addOutput(fileJoinPath + "/"+originalFileNameWithoutExtension+"_"+i+".mp4")
+                    .addOutput(totalPath)
                     .done();
 
             FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
@@ -81,6 +83,10 @@ public class VideoFileUtils {
             }).run();
 
             log.info("split done");
+
+            createTxt(totalPath, fileJoinPath.getAbsolutePath(), originalFileNameWithoutExtension);
+
+
             startPoint += streamSize;
 
         }
