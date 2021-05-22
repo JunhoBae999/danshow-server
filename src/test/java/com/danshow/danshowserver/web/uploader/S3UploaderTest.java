@@ -35,7 +35,7 @@ class S3UploaderTest {
                 "video/mp4",
                 "video test".getBytes(StandardCharsets.UTF_8));
 
-        String result = s3Uploader.upload(video);
+        String result = s3Uploader.upload(video,"image");
         System.out.println("result = " + result);
     }
 
