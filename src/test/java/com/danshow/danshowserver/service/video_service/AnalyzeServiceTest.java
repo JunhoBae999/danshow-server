@@ -92,6 +92,15 @@ class AnalyzeServiceTest {
         videoFileUtils.createTxt(totalPathSecond,fileJoinPath,oriName);
     }
 
+    @Test
+    public void extractThumbnail() throws Exception {
+
+        final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
+
+        String outputPath = System.getProperty("user.dir") + "/files";
+        videoFileUtils.extractThumbnail(realVideo.getFile().getAbsolutePath(),realVideo.getFile().getName(),outputPath);
+    }
 
 
 

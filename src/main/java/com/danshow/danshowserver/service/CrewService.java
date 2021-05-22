@@ -11,6 +11,7 @@ import com.danshow.danshowserver.web.dto.crew.CrewSaveRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -26,18 +27,19 @@ public class CrewService {
     private final CrewRepository crewRepository;
 
     @Transactional
-    public void save(CrewSaveRequestDto crewSaveRequestDto, String email) {
+    public void save(MultipartFile image, CrewSaveRequestDto crewSaveRequestDto, String email) {
 
+        //String image_url = uploadFile(image);
         crewRepository.save(Crew.builder()
                 .description(crewSaveRequestDto.getDescription())
-                .crew_profile_image(crewSaveRequestDto.getImage_url())
+                //.crew_profile_image(crewSaveRequestDto.getImage_url())
                 .dancer(dancerRepository.findByEmail(email)).build());
     }
 
     @Transactional
     public void update(CrewSaveRequestDto crewSaveRequestDto, String email) {
         Crew crew = crewRepository.findByDancer(dancerRepository.findByEmail(email));
-        crew.setCrew_profile_image(crewSaveRequestDto.getImage_url());
+        //crew.setCrew_profile_image(crewSaveRequestDto.getImage_url());
         crew.setDescription(crewSaveRequestDto.getDescription());
     }
 
