@@ -40,7 +40,16 @@ spring :
       max-file-size: 200MB
       max-request-size: 215MB
 
-
+cloud:
+  aws:
+    s3:
+      bucket: elasticbeanstalk-ap-northeast-2-600826168989
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      instanceProfile: true # AWS CLI에서 aws configure list 정보를 반영할건지 여부
 
 
 

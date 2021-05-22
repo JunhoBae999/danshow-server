@@ -38,3 +38,5 @@ out/
 
 ### OAUTH2 ###
 application-oauth.yml
+### AWS ###
+#appplication-credentials.yml
