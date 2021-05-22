@@ -44,7 +44,6 @@ public class VideoFileUtils {
 
     public void splitFile(String inputPath,String originalFileName, String outputPath ,Integer chunkNumber) throws IOException {
 
-
         FFmpegProbeResult probeResult = fFprobe.probe(inputPath);
 
         Double totalDuration = probeResult.getFormat().duration;
