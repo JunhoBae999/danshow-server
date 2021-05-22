@@ -32,7 +32,8 @@ public class VideoController {
     @PostMapping("/api/v1/file")
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
                                      @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
-                                     @ApiParam(value = "유저", required = true) @RequestParam("userID") String userId, @RequestPart(value = "thumbnail",required = false) MultipartFile image)  {
+                                     @ApiParam(value = "유저", required = true) @RequestParam("userID") String userId,
+                                             @RequestPart(value = "thumbnail",required = false) MultipartFile image)  {
         try {
             videoService.save(video,videoPostSaveDto,userId,image);
         } catch (Exception e) {

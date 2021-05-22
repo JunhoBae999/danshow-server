@@ -18,9 +18,10 @@ import java.io.IOException;
 @Component
 public class VideoFileUtils {
 
-    private String ffmpegPath = "/usr/local/bin/ffmpeg";
-
-    private String ffprobePath = "/usr/local/bin/ffprobe";
+    //private String ffmpegPath = "/usr/local/bin/ffmpeg";
+    private String ffmpegPath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffmpeg";
+    //private String ffprobePath = "/usr/local/bin/ffprobe";
+    private String ffprobePath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffprobe";
 
     private FFmpeg fFmpeg;
 
@@ -112,6 +113,23 @@ public class VideoFileUtils {
 
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
         executor.createJob(builder).run();
+    }
+
+    public void extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
+
+        String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
+        outputPath = outputPath + "/" +originalFileNameWithoutExtension;
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .setInput(inputPath)
+                .addExtraArgs("-ss", "00:00:01")
+                .addOutput(outputPath + "/" + originalFileNameWithoutExtension + "_thumbnail.gif")
+                .setFrames(1)
+                .done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);		// FFmpeg 명령어 실행을 위한 FFmpegExecutor 객체 생성
+        executor.createJob(builder).run();
+
     }
 
     public void createTxt(String totalFilePath, String fileJoinPath, String originalFileNameWithoutExtension) {
