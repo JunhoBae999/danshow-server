@@ -36,7 +36,13 @@ class S3UploaderTest {
                 "video test".getBytes(StandardCharsets.UTF_8));
 
         String result = s3Uploader.upload(video,"image");
-        System.out.println("result = " + result);
+        System.out.println("result_multipart = " + result);
     }
 
+    @Test
+    public void localFileUploadTest() throws IOException {
+        String result = s3Uploader
+                .upload("files/woman/woman_thumbnail.gif","test.gif","image");
+        System.out.println("result2_filename = " + result);
+    }
 }

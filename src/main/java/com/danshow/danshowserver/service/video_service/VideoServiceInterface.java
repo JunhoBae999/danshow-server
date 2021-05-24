@@ -12,9 +12,9 @@ import java.io.IOException;
 
 public interface VideoServiceInterface {
 
-    public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId, MultipartFile image) throws Exception;
+    public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception;
 
-    public AttachFile uploadFile(MultipartFile video) throws IOException;
+    public AttachFile uploadFile(MultipartFile video, String savePath) throws IOException;
 
     public AttachFile getVideo(Long id);
 

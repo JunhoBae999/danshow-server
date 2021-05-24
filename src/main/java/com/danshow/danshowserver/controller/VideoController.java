@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.controller;
 
+import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
@@ -27,19 +28,21 @@ import java.net.MalformedURLException;
 public class VideoController {
 
     private final VideoServiceInterface videoService;
+    private final TokenProvider tokenProvider;
 
     @ApiOperation(value = "Upload Video Post",notes = "Request with Video file, Video post request object, User, Thumbnail image to create post")
     @PostMapping("/api/v1/file")
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
                                      @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
-                                     @ApiParam(value = "유저", required = true) @RequestParam("userID") String userId,
-                                             @RequestPart(value = "thumbnail",required = false) MultipartFile image)  {
+                                     @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt)  {
+        String userId = tokenProvider.getUserPk(Jwt);
         try {
-            videoService.save(video,videoPostSaveDto,userId,image);
+            videoService.save(video,videoPostSaveDto,userId);
+            return new ResponseEntity<>("success", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new ResponseEntity<>("fail", HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get Video Post", notes = "Get Video Post By Id")
