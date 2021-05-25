@@ -39,13 +39,13 @@ public class VideoServiceImplLocal implements VideoServiceInterface {
         User dancer = userRepository.findByEmail(userId);
         String savePath = System.getProperty("user.dir") + "/files";
 
-        AttachFile uploadedVideo = uploadFile(video,savePath);
-        AttachFile uploadImage = uploadFile(video,savePath); //TODO 로컬 구현은 우선순위가 아닌거같아 일단 이렇게 남깁니다
+        AttachFile uploadedVideo = uploadFile(video,"",savePath);
+        AttachFile uploadImage = uploadFile(video,"",savePath); //TODO 로컬 구현은 우선순위가 아닌거같아 일단 이렇게 남깁니다
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage);
         videoPostRepository.save(videoPost);
     }
 
-    public AttachFile uploadFile(MultipartFile video, String savePath) throws IOException {
+    public AttachFile uploadFile(MultipartFile video, String customFileName, String savePath) throws IOException {
 
         String originalFilename = video.getOriginalFilename();
         UUID uuid = UUID.randomUUID();

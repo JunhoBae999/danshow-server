@@ -14,6 +14,9 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -44,8 +47,7 @@ public class VideoFileUtils {
         }
     }
 
-    public void splitFile(String inputPath,String originalFileName, String outputPath ,Integer chunkNumber) throws IOException {
-
+    public List<String> splitFile(String inputPath, String originalFileName, String outputPath , Integer chunkNumber) throws IOException {
 
         FFmpegProbeResult probeResult = fFprobe.probe(inputPath);
 
@@ -53,7 +55,9 @@ public class VideoFileUtils {
         Double streamSize = totalDuration / chunkNumber;
 
         String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
+        String originalFileNameWithoutExtensionWithUUID = UUID.randomUUID().toString() + "-" + originalFileNameWithoutExtension;
 
+        List<String> splitFileList = new ArrayList<String>();
         int startPoint = 0;
 
         File fileJoinPath = new File(outputPath + "/" +originalFileNameWithoutExtension);
@@ -67,7 +71,7 @@ public class VideoFileUtils {
 
             log.info("output path : " + fileJoinPath);
 
-            String totalPath = fileJoinPath + "/"+originalFileNameWithoutExtension+"_"+i+".mp4";
+            String totalPath = fileJoinPath + "/"+originalFileNameWithoutExtensionWithUUID+"_"+i+".mp4";
 
             FFmpegBuilder builder = new FFmpegBuilder()
                     .overrideOutputFiles(true)
@@ -86,13 +90,12 @@ public class VideoFileUtils {
 
             log.info("split done");
 
-            createTxt(totalPath, fileJoinPath.getAbsolutePath(), originalFileNameWithoutExtension);
+            createTxt(totalPath, fileJoinPath.getAbsolutePath(), originalFileNameWithoutExtensionWithUUID);
 
-
+            splitFileList.add(totalPath);
             startPoint += streamSize;
-
         }
-
+        return splitFileList;
     }
 
     /**
@@ -116,6 +119,7 @@ public class VideoFileUtils {
         executor.createJob(builder).run();
     }
 
+    //로컬에 있는 파일로부터 썸네일 생성
     public String extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
 
         String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
@@ -133,8 +137,19 @@ public class VideoFileUtils {
         executor.createJob(builder).run();
         return outputPath;
     }
+    
+    // 멀티파일을 받아서 로컬에 저장하고 썸네일 생성
     public String extractThumbnail(MultipartFile video) throws IOException {
         String originalFileName = video.getOriginalFilename();
+        String outputPath = System.getProperty("user.dir") + "/files";
+        String inputPath = System.getProperty("user.dir") + "/files/"
+                +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName;
+        video.transferTo(new File(inputPath));
+        return extractThumbnail(inputPath, originalFileName, outputPath);
+    }
+
+    //멀티파일과 저장할 파일 이름을 받아서 로컬에 저장하고 썸네일 생성
+    public String extractThumbnail(MultipartFile video, String originalFileName) throws IOException {
         String outputPath = System.getProperty("user.dir") + "/files";
         String inputPath = System.getProperty("user.dir") + "/files/"
                 +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName;
@@ -159,4 +174,10 @@ public class VideoFileUtils {
         }
     }
 
+    public void deleteFile(String filePath) {
+        File deleteFile = new File(filePath);
+        if(deleteFile.exists()) {
+            deleteFile.delete();
+        }
+    }
 }
