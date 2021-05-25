@@ -26,8 +26,6 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     @Override
     public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId, MultipartFile image) throws Exception {
-
-
     }
 
     @Override
