@@ -1,12 +1,15 @@
 package com.danshow.danshowserver.service.video_service;
 
+import com.danshow.danshowserver.domain.crew.Crew;
 import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
+import com.danshow.danshowserver.web.dto.Thumbnail;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
+import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -70,7 +73,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
     }
 
     //비디오를 분할해서 S3 업로드 후 주소 return
-    public List<String> split(MultipartFile video, Integer chunks) throws Exception {
+    public List<String> splitUpload(MultipartFile video, Integer chunks) throws Exception {
         
         //임시폴더에 전체 영상 저장
         File fileJoinPath = new File(System.getProperty("user.dir") + "/tmp");
@@ -123,6 +126,25 @@ public class VideoServiceRelease implements VideoServiceInterface{
         return savedImage;
     }
 
+    public VideoMainResponseDto mainPage() {
+        List<Thumbnail> thumbnailList = new ArrayList<>();
+        List<VideoPost> all = videoPostRepository.findAll();
+        for (int i = 0; i < all.size() && i < 6; i++) {
+            // 최대 6개까지만 리스트에 담기
+            thumbnailList.add(makeThumbnail(all.get(i)));
+        }
+        return VideoMainResponseDto.builder()
+                .videoThumbnailList(thumbnailList)
+                .build();
+    }
+
+    public Thumbnail makeThumbnail(VideoPost videoPost) {
+        return Thumbnail.builder()
+                .title(videoPost.getTitle())
+                .image_url(videoPost.getImage().getFilePath())
+                .thumbnailText(videoPost.getDescription())
+                .build();
+    }
     @Override
     public AttachFile getVideo(Long id) {
         return null;

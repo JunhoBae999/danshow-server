@@ -31,7 +31,7 @@ class VideoServiceReleaseTest {
                 "video/mp4",
                 Files.readAllBytes(realVideo.getFile().toPath()));
 
-        List<String> splitFileList = videoService.split(video,2);
+        List<String> splitFileList = videoService.splitUpload(video,2);
         assertThat(splitFileList.size()).isEqualTo(2);
         for(String s : splitFileList) {
             System.out.println("s = " + s);

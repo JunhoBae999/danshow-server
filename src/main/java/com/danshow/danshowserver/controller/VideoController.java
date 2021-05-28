@@ -6,6 +6,7 @@ import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
 import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
+import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -82,6 +83,13 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .contentType(MediaTypeFactory.getMediaType(responseVideo).orElse(MediaType.APPLICATION_OCTET_STREAM))
                 .body(region);
+    }
+
+    @ApiOperation(value = "메인화면 비디오 썸네일", notes = "메인화면의 비디오 썸네일을 제공합니다.")
+    @GetMapping("/api/v1/videos/main")
+    public ResponseEntity<VideoMainResponseDto> videoMain() {
+        VideoMainResponseDto responseDto = videoService.mainPage();
+        return new ResponseEntity<>(responseDto,HttpStatus.OK);
     }
 
     @ApiOperation(value = "Video Streaming Totally" , notes = "Stream the Video with small size as array")
