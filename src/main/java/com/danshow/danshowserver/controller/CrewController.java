@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Api(tags = {"3.Crew"})
@@ -41,8 +42,9 @@ public class CrewController {
     @ApiOperation(value = "크루 업데이트" , notes = "댄서가 관리하는 크루를 업데이트 합니다.")
     @PostMapping("crew/update")
     public ResponseEntity<String> crewUpdate(@RequestBody CrewSaveRequestDto crewSaveRequestDto,
-                                             @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
-        crewService.update(crewSaveRequestDto,tokenProvider.getUserPk(Jwt));
+                                             @RequestPart MultipartFile image,
+                                             @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
+        crewService.update(image, crewSaveRequestDto,tokenProvider.getUserPk(Jwt));
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
@@ -51,7 +53,8 @@ public class CrewController {
     public ResponseEntity<CrewResponseDto> getCrewInfo(@ApiParam(value = "크루 식별")@PathVariable Long id) {
         return new ResponseEntity<>(crewService.findById(id), HttpStatus.OK);
     }
-
+    
+    @ApiOperation(value = "크루 메인페이지", notes = "크루 6개의 썸네일을 제공합니다")
     @GetMapping("crew/main")
     public ResponseEntity<List<Thumbnail>> crewMain() {
         return new ResponseEntity<>(crewService.crewMainList(), HttpStatus.OK);

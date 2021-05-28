@@ -3,6 +3,7 @@ package com.danshow.danshowserver.service.video_service;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
+import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,8 @@ import java.io.IOException;
 public interface VideoServiceInterface {
 
     public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception;
+
+    public VideoMainResponseDto mainPage();
 
     public AttachFile uploadFile(MultipartFile video, String customFileName, String savePath) throws IOException;
 

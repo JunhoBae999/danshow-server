@@ -9,13 +9,10 @@ import lombok.NoArgsConstructor;
 public class CrewSaveRequestDto {
     private String title;
     private String description;
-    private String image_url;
 
     @Builder
-    public CrewSaveRequestDto(String title, String description, String image_url) {
+    public CrewSaveRequestDto(String title, String description) {
         this.title = title;
         this.description = description;
-        this.image_url = image_url;
     }
-
 }
