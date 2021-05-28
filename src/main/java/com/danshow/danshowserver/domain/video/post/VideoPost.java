@@ -49,6 +49,8 @@ public class VideoPost {
 
     private String songName;
 
+    private String audioPath;
+
     public void setVideo(AttachFile video) {
         this.video = video;
     }
@@ -62,7 +64,8 @@ public class VideoPost {
     }
 
     //Post 생성을 위한
-    public static VideoPost createVideoPost(VideoPostSaveDto videoPostSaveDto, User user, AttachFile requestVideo, AttachFile requestImage) {
+    public static VideoPost createVideoPost(VideoPostSaveDto videoPostSaveDto, User user,
+                                            AttachFile requestVideo, AttachFile requestImage, String audioPath) {
         VideoPost videoPost = new VideoPost();
 
         videoPost.description = videoPostSaveDto.getDescription();
@@ -73,6 +76,7 @@ public class VideoPost {
         videoPost.length = videoPostSaveDto.getLength();
         videoPost.difficulty = videoPost.getDifficulty();
         videoPost.video = requestVideo;
+        videoPost.audioPath = audioPath;
 
         requestVideo.setVideoPost(videoPost);
         requestVideo.setUser(user);

@@ -7,6 +7,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.modelmapper.internal.util.Assert;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,10 +23,10 @@ import java.util.UUID;
 @Component
 public class VideoFileUtils {
 
-    private String ffmpegPath = "/usr/local/bin/ffmpeg";
-    //private String ffmpegPath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffmpeg";
-    private String ffprobePath = "/usr/local/bin/ffprobe";
-    //private String ffprobePath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffprobe";
+    @Value("${local.ffmpeg}")
+    private String ffmpegPath;
+    @Value("${local.ffprobe}")
+    private String ffprobePath;
 
     private FFmpeg fFmpeg;
 
@@ -115,8 +116,7 @@ public class VideoFileUtils {
     public String extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
 
         String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
-        outputPath = outputPath + "/" +originalFileNameWithoutExtension
-                + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
+        outputPath = outputPath + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
@@ -144,8 +144,9 @@ public class VideoFileUtils {
     //멀티파일과 저장할 파일 이름을 받아서 로컬에 저장하고 썸네일 생성
     public String extractThumbnail(MultipartFile video, String originalFileName) throws IOException {
         String outputPath = System.getProperty("user.dir") + "/files";
-        String inputPath = System.getProperty("user.dir") + "/files/"
-                +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName;
+        /* String inputPath = System.getProperty("user.dir") + "/files/"
+                +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName; */
+        String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
         video.transferTo(new File(inputPath));
         return extractThumbnail(inputPath, originalFileName, outputPath);
     }
@@ -211,6 +212,14 @@ public class VideoFileUtils {
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);		// FFmpeg 명령어 실행을 위한 FFmpegExecutor 객체 생성
         executor.createJob(builder).run();
         return outputPath;
+    }
+
+    //멀티파일과 저장할 파일 이름을 받아서 로컬에 저장하고 오디오 생성
+    public String extractAudio(MultipartFile video, String originalFileName) throws IOException {
+        String outputPath = System.getProperty("user.dir") + "/files";
+        String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
+        video.transferTo(new File(inputPath));
+        return extractAudio(inputPath, originalFileName, outputPath);
     }
 
     public void createDirectory(String path) {

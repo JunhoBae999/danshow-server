@@ -50,11 +50,9 @@ public class VideoServiceRelease implements VideoServiceInterface{
         AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
         AttachFile uploadImage = uploadThumbnail(video, uuidFileName);
 
-        /*
-        음원 추출 로직만 추가하면 됨.
-         */
+        String audioPath = uploadAudio(video,uuidFileName); //mp3 추출 후 업로드 로직
 
-        VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage);
+        VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage, audioPath);
         videoPostRepository.save(videoPost);
     }
 
@@ -105,7 +103,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
         String thumbnailPath = videoFileUtils.extractThumbnail(video,customFileName);
         String fileName = thumbnailPath
                 .substring(thumbnailPath
-                        .lastIndexOf("/"),-1);
+                        .lastIndexOf("/")+1);
         
         //S3업로드 된 주소
         String filePath = s3Uploader.upload(thumbnailPath,fileName,"image");
@@ -158,5 +156,24 @@ public class VideoServiceRelease implements VideoServiceInterface{
     @Override
     public ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) {
         return null;
+    }
+
+    public String uploadAudio(MultipartFile video, String customFileName) throws IOException {
+        String audioPath = videoFileUtils.extractAudio(video,customFileName);
+        String fileName = audioPath
+                .substring(audioPath
+                        .lastIndexOf("/")+1);
+        System.out.println("fileName!! = " + fileName);
+        //S3업로드 된 주소
+        String filePath = s3Uploader.upload(audioPath,fileName,"audio");
+
+        //오디오 업로드 후 임시파일 삭제
+        File deleteFile = new File(audioPath);
+
+        if(deleteFile.exists()) {
+            deleteFile.delete();
+        }
+
+        return filePath;
     }
 }
