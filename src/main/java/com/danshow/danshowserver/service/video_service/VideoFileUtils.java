@@ -59,18 +59,11 @@ public class VideoFileUtils {
         List<String> splitFileList = new ArrayList<String>();
         int startPoint = 0;
 
-        File fileJoinPath = new File(outputPath + "/" +originalFileNameWithoutExtension);
-
-        if (!fileJoinPath.exists()) {
-            fileJoinPath.mkdirs();
-            log.info("Created Directory -> "+ fileJoinPath.getAbsolutePath());
-        }
+        createDirectory(outputPath);
 
         for(int i = 1; i<=chunkNumber; i++) {
 
-            log.info("output path : " + fileJoinPath);
-
-            String totalPath = fileJoinPath + "/"+originalFileNameWithoutExtensionWithUUID+"_"+i+".mp4";
+            String totalPath = outputPath + "/"+originalFileNameWithoutExtensionWithUUID+"_"+i+".mp4";
 
             FFmpegBuilder builder = new FFmpegBuilder()
                     .overrideOutputFiles(true)
@@ -89,7 +82,7 @@ public class VideoFileUtils {
 
             log.info("split done");
 
-            createTxt(totalPath, fileJoinPath.getAbsolutePath(), originalFileNameWithoutExtensionWithUUID);
+            createTxt(totalPath, outputPath, originalFileNameWithoutExtensionWithUUID);
 
             splitFileList.add(totalPath);
             startPoint += streamSize;
@@ -178,6 +171,35 @@ public class VideoFileUtils {
         File deleteFile = new File(filePath);
         if(deleteFile.exists()) {
             deleteFile.delete();
+        }
+    }
+
+    public String extractAudio(String inputPath,String originalFileName, String outputPath) throws IOException {
+        String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
+        outputPath = outputPath + "/" +originalFileNameWithoutExtension + "_audio.mp3";
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .setInput(inputPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-ab","128k")
+                .addExtraArgs("-vn")                    //비디오 추출 안함
+                //.addExtraArgs("-acodec","libmp3lame")   //오디오 코덱 지정, mp3
+                .addExtraArgs("-ar","44.1k")            //sampling rate
+                .addExtraArgs("-ac","2")                //오디오 2채널
+                .addExtraArgs("-f","mp3")
+                .done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);		// FFmpeg 명령어 실행을 위한 FFmpegExecutor 객체 생성
+        executor.createJob(builder).run();
+        return outputPath;
+    }
+
+    public void createDirectory(String path) {
+        File fileJoinPath = new File(path);
+
+        if (!fileJoinPath.exists()) {
+            fileJoinPath.mkdirs();
         }
     }
 }
