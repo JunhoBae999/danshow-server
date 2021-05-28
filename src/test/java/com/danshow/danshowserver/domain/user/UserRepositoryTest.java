@@ -32,6 +32,7 @@ class UserRepositoryTest {
                 .email("testmember@test.com")
                 .nickname("testnick")
                 .membership(true)
+                .role(Role.MEMBER)
                 .name("junho")
                 .build();
 
@@ -55,6 +56,7 @@ class UserRepositoryTest {
                 .email("testmember@test.com")
                 .nickname("testnick")
                 .membership(true)
+                .role(Role.MEMBER)
                 .name("junho")
                 .build();
 
@@ -75,6 +77,7 @@ class UserRepositoryTest {
                 .email("testmember@test.com")
                 .nickname("testnick")
                 .membership(true)
+                .role(Role.MEMBER)
                 .name("junho")
                 .build();
 

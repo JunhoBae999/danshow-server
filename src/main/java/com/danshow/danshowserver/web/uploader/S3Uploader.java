@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
@@ -53,11 +54,25 @@ public class S3Uploader {
                 .build();
     }
 
-    public String upload(MultipartFile file, String filePath) throws IOException {
-        filePath = filePath + "/" + file.getOriginalFilename();
-
-        s3Client.putObject(new PutObjectRequest(bucket, filePath, file.getInputStream(), null)
+    public String upload(MultipartFile file, String s3SavePath) throws IOException {
+        s3SavePath = s3SavePath + "/" + file.getOriginalFilename();
+        s3Client.putObject(new PutObjectRequest(bucket, s3SavePath, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
-        return s3Client.getUrl(bucket, filePath).toString();
+        return s3Client.getUrl(bucket, s3SavePath).toString();
+    }
+
+    public String upload(String filePath, String fileName, String s3SavePath) throws IOException {
+        File file = new File(filePath);
+        s3SavePath = s3SavePath + "/" + fileName;
+        s3Client.putObject(new PutObjectRequest(bucket, s3SavePath, file)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        return s3Client.getUrl(bucket, s3SavePath).toString();
+    }
+
+    public String upload(File file, String s3SavePath) throws IOException {
+        s3SavePath = s3SavePath + "/" + file.getName();
+        s3Client.putObject(new PutObjectRequest(bucket, s3SavePath, file)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        return s3Client.getUrl(bucket, s3SavePath).toString();
     }
 }

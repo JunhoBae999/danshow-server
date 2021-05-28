@@ -8,6 +8,7 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.modelmapper.internal.util.Assert;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -114,21 +115,31 @@ public class VideoFileUtils {
         executor.createJob(builder).run();
     }
 
-    public void extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
+    public String extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
 
         String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
-        outputPath = outputPath + "/" +originalFileNameWithoutExtension;
+        outputPath = outputPath + "/" +originalFileNameWithoutExtension
+                + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
+
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
                 .setInput(inputPath)
                 .addExtraArgs("-ss", "00:00:01")
-                .addOutput(outputPath + "/" + originalFileNameWithoutExtension + "_thumbnail.gif")
+                .addOutput(outputPath)
                 .setFrames(1)
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);		// FFmpeg 명령어 실행을 위한 FFmpegExecutor 객체 생성
         executor.createJob(builder).run();
-
+        return outputPath;
+    }
+    public String extractThumbnail(MultipartFile video) throws IOException {
+        String originalFileName = video.getOriginalFilename();
+        String outputPath = System.getProperty("user.dir") + "/files";
+        String inputPath = System.getProperty("user.dir") + "/files/"
+                +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName;
+        video.transferTo(new File(inputPath));
+        return extractThumbnail(inputPath, originalFileName, outputPath);
     }
 
     public void createTxt(String totalFilePath, String fileJoinPath, String originalFileNameWithoutExtension) {
