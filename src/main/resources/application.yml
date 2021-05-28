@@ -50,6 +50,10 @@ spring :
       max-file-size: 200MB
       max-request-size: 215MB
 
+local:
+  ffmpeg: "/usr/local/bin/ffmpeg"
+  ffprobe: "/usr/local/bin/ffprobe"
+
 
 
 
