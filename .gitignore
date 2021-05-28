@@ -41,3 +41,4 @@ application-oauth.yml
 ### AWS ###
 application-credentials.yml
 **/files/
+**/tmp/

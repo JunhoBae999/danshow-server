@@ -55,7 +55,11 @@ public class S3Uploader {
     }
 
     public String upload(MultipartFile file, String s3SavePath) throws IOException {
-        s3SavePath = s3SavePath + "/" + file.getOriginalFilename();
+        return upload(file,file.getOriginalFilename(),s3SavePath);
+    }
+
+    public String upload(MultipartFile file, String customFileName, String s3SavePath) throws IOException {
+        s3SavePath = s3SavePath + "/" + customFileName;
         s3Client.putObject(new PutObjectRequest(bucket, s3SavePath, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
         return s3Client.getUrl(bucket, s3SavePath).toString();
