@@ -25,6 +25,4 @@ public interface VideoServiceInterface {
 
     ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) throws IOException;
 
-
-
 }

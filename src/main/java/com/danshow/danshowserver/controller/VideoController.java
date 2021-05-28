@@ -36,7 +36,9 @@ public class VideoController {
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
                                      @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
                                      @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt)  {
+
         String userId = tokenProvider.getUserPk(Jwt);
+
         try {
             videoService.save(video,videoPostSaveDto,userId);
             return new ResponseEntity<>("success", HttpStatus.OK);
@@ -95,10 +97,4 @@ public class VideoController {
                 .contentType(MediaTypeFactory.getMediaType(resVideo).orElse(MediaType.APPLICATION_OCTET_STREAM))
                 .body(resVideo);
     }
-
-
-
-
-
-
 }

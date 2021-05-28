@@ -22,10 +22,10 @@ import java.util.UUID;
 @Component
 public class VideoFileUtils {
 
-    //private String ffmpegPath = "/usr/local/bin/ffmpeg";
-    private String ffmpegPath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffmpeg";
-    //private String ffprobePath = "/usr/local/bin/ffprobe";
-    private String ffprobePath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffprobe";
+    private String ffmpegPath = "/usr/local/bin/ffmpeg";
+    //private String ffmpegPath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffmpeg";
+    private String ffprobePath = "/usr/local/bin/ffprobe";
+    //private String ffprobePath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffprobe";
 
     private FFmpeg fFmpeg;
 
@@ -48,7 +48,6 @@ public class VideoFileUtils {
     }
 
     public List<String> splitFile(String inputPath, String originalFileName, String outputPath , Integer chunkNumber) throws IOException {
-
         FFmpegProbeResult probeResult = fFprobe.probe(inputPath);
 
         Double totalDuration = probeResult.getFormat().duration;
@@ -125,6 +124,7 @@ public class VideoFileUtils {
         String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
         outputPath = outputPath + "/" +originalFileNameWithoutExtension
                 + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
+
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
                 .setInput(inputPath)

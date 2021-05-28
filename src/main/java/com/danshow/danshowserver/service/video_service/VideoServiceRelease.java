@@ -29,7 +29,6 @@ import java.util.UUID;
 서버 배포용 service
  */
 
-@Profile("release")
 @RequiredArgsConstructor
 @Service
 public class VideoServiceRelease implements VideoServiceInterface{
@@ -43,18 +42,18 @@ public class VideoServiceRelease implements VideoServiceInterface{
     public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception {
 
         User dancer = userRepository.findByEmail(userId);
-        
+
         //uuid 붙인 파일명 생성
         UUID uuid = UUID.randomUUID();
         String uuidFileName = uuid+"-"+video.getOriginalFilename();
-        
+
         AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
         AttachFile uploadImage = uploadThumbnail(video, uuidFileName);
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage);
         videoPostRepository.save(videoPost);
     }
 
-    @Override
+
     public AttachFile uploadFile(MultipartFile video,String customFileName, String saveFolder) throws IOException {
         String originalFilename = video.getOriginalFilename();
 
@@ -65,7 +64,6 @@ public class VideoServiceRelease implements VideoServiceInterface{
                 .filePath(filePath)
                 .originalFileName(originalFilename)
                 .build();
-
         return savedVideo;
     }
 
@@ -88,15 +86,13 @@ public class VideoServiceRelease implements VideoServiceInterface{
         List<String> s3FilePathList = new ArrayList<String>();
         for(String filePath : splitFiles) {
             s3FilePathList.add(
-                    s3Uploader.upload(filePath,filePath.substring(filePath.lastIndexOf("/")+1),"splitVideo"));
+                    s3Uploader.upload(filePath, filePath.substring(filePath.lastIndexOf("/") + 1), "splitVideo"));
         }
-        
         //임시파일들 전부 제거
         videoFileUtils.deleteFile(temporalFilePath);
         for(String filePath : splitFiles) {
             videoFileUtils.deleteFile(filePath);
         }
-
         return s3FilePathList;
     }
 
@@ -117,11 +113,14 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
         //썸네일 업로드 후 임시파일 삭제
         File deleteFile = new File(thumbnailPath);
+
         if(deleteFile.exists()) {
             deleteFile.delete();
         }
+
         return savedImage;
     }
+
     public VideoMainResponseDto mainPage() {
         List<Thumbnail> thumbnailList = new ArrayList<>();
         List<VideoPost> all = videoPostRepository.findAll();
@@ -141,7 +140,6 @@ public class VideoServiceRelease implements VideoServiceInterface{
                 .thumbnailText(videoPost.getDescription())
                 .build();
     }
-
     @Override
     public AttachFile getVideo(Long id) {
         return null;
