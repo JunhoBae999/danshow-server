@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.controller;
 
+import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.user.*;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
@@ -45,18 +46,16 @@ class VideoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     MemberRepository memberRepository;
-
     @Autowired
     DancerRepository dancerRepository;
-
     @Autowired
     VideoPostRepository videoPostRepository;
-
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    TokenProvider tokenProvider;
 
     @BeforeEach
     public  void setUp() {
@@ -136,14 +135,6 @@ class VideoControllerTest {
                 "video/mp4",
                 Files.readAllBytes(realVideo.getFile().toPath()));
 
-        Resource realImage =  defaultResourceLoader.getResource("classpath:demofile/fuck.png");
-
-
-        MockMultipartFile image = new MockMultipartFile("thumbnail",
-                "image.jpeg",
-                "image/jpeg",
-                Files.readAllBytes(realImage.getFile().toPath()));
-
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
                 1L,"idol","boy",1L));
 
@@ -151,9 +142,8 @@ class VideoControllerTest {
 
         MvcResult result = this.mockMvc.perform(multipart("/api/v1/file")
                 .file(video)
-                .file(image)
                 .file(json)
-                .param("userID", "test.test@test.test")
+                .header("X-AUTH-TOKEN", tokenProvider.createToken("dancer_test@test.test",Role.DANCER.getKey()))
                 .contentType("multipart/mixed")
                 .accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8"))

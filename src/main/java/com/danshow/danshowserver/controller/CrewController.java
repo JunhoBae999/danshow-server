@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,8 +28,13 @@ public class CrewController {
     @ApiOperation(value = "크루 생성" , notes = "댄서가 크루를 생성합니다.")
     @PostMapping("crew/save")
     public ResponseEntity<String> crewSave(@RequestBody CrewSaveRequestDto crewSaveRequestDto,
+                                           @RequestPart MultipartFile image, //TODO
                                            @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
-        crewService.save(crewSaveRequestDto, tokenProvider.getUserPk(Jwt));
+        try {
+            crewService.save(image,crewSaveRequestDto,tokenProvider.getUserPk(Jwt));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 

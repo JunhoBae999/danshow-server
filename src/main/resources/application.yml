@@ -1,13 +1,23 @@
 spring :
   profiles:
-    active : dev
-    include : oauth
+    active : release #dev
+    include : oauth, credentials, dev
 
 logging:
   level:
     org.hibernate.SQL : #debug #sql이 3번씩 출력되길래 주석처리 했습니다. 그래도 2번씩 나옵니다.
     org.hibernate.type : #trace
 
+cloud:
+  aws:
+    s3:
+      bucket: elasticbeanstalk-ap-northeast-2-600826168989
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      instanceProfile: true # AWS CLI에서 aws configure list 정보를 반영할건지 여부
 ---
 spring :
   config:
@@ -15,9 +25,9 @@ spring :
       on-profile: dev
 
   datasource:
-    url : jdbc:mysql://danshow.cw5qxinyojf3.ap-northeast-2.rds.amazonaws.com:3306/danshow
+    url : jdbc:mysql://database-1.cayunvr1hlud.ap-northeast-2.rds.amazonaws.com:3306/danshow
     username : admin
-    password: gmdrb918
+    password: danshow123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa :
