@@ -46,6 +46,11 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
         AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
         AttachFile uploadImage = uploadThumbnail(video, uuidFileName);
+
+        /*
+        음원 추출 로직만 추가하면 됨.
+         */
+
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage);
         videoPostRepository.save(videoPost);
     }

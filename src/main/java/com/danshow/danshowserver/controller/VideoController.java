@@ -30,6 +30,13 @@ public class VideoController {
     private final VideoServiceInterface videoService;
     private final TokenProvider tokenProvider;
 
+    /**
+     * 댄서가 비디오를 업로드 하는 경우입니다. 업로드 할 시 그대로 저장되며, 음원 파일이 추출됩니다.
+     * @param video
+     * @param videoPostSaveDto
+     * @param Jwt
+     * @return
+     */
     @ApiOperation(value = "Upload Video Post",notes = "Request with Video file, Video post request object, User, Thumbnail image to create post")
     @PostMapping("/api/v1/file")
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
@@ -88,5 +95,24 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .contentType(MediaTypeFactory.getMediaType(resVideo).orElse(MediaType.APPLICATION_OCTET_STREAM))
                 .body(resVideo);
+    }
+
+    @ApiOperation(value = "유저 테스트 비디오 선택", notes = "유저가 테스트할 비디오를 선택하는 경우 음원파일을 제공합니다.")
+    @GetMapping("/api/v1/videos/{id}/music")
+    public ResponseEntity<UrlResource> getSelectedVideoMp4(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id) {
+        /*
+        전달받은 비디오 파일의 음원 파일 전달
+         */
+        return null;
+    }
+
+    @ApiOperation(value = "유저 테스트 비디오 업로드",notes = "유저가 음원과 함께 녹화한 비디오를 업로드합니다.")
+    public ResponseEntity<UrlResource> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @ApiParam(value = "유저 테스트 비디오")
+                                                           @RequestPart MultipartFile userTestVideo)
+    {
+      /*
+      전달받은 유저의 비디오를 분석하여 전달
+       */
+        return null;
     }
 }
