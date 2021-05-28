@@ -181,5 +181,23 @@ public class VideoFileUtils {
         }
     }
 
+    public String integrateFileSideBySide(String firstVideoPath, String secondVideoPath, String outputPath) {
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .addInput(firstVideoPath)
+                .addInput(secondVideoPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-preset", "ultrafast")
+                .addExtraArgs("-filter_complex", "[0:v]setpts=PTS-STARTPTS, pad=iw*2+5:ih[bg]; [1:v]setpts=PTS-STARTPTS[fg]; [bg][fg]overlay=w+10")
+                .done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
+        executor.createJob(builder).run();
+
+        return outputPath;
+
+    }
+
 
 }

@@ -103,6 +103,15 @@ class AnalyzeServiceTest {
     }
 
 
+    @Test
+    public void testIntegrateSideBySide() throws  Exception {
+        final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
+        String outputPath = System.getProperty("user.dir") + "/files/";
+        videoFileUtils.integrateFileSideBySide(realVideo.getFile().getAbsolutePath(), realVideo.getFile().getAbsolutePath(),outputPath);
+    }
+
+
 
 
 }
