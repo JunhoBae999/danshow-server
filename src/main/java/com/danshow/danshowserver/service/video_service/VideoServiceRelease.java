@@ -5,6 +5,7 @@ import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.domain.video.FileRepository;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.web.dto.Thumbnail;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 /*
@@ -35,6 +37,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     private final UserRepository userRepository;
     private final VideoPostRepository videoPostRepository;
+    private final FileRepository fileRepository;
     private final S3Uploader s3Uploader;
     private final VideoFileUtils videoFileUtils;
 
@@ -130,7 +133,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
         List<Thumbnail> thumbnailList = new ArrayList<>();
         List<VideoPost> all = videoPostRepository.findAll();
         for (int i = 0; i < all.size() && i < 6; i++) {
-            // 최대 6개까지만 리스트에 담기
+            // 최대 6개까지만 리스트에 담기d
             thumbnailList.add(makeThumbnail(all.get(i)));
         }
         return VideoMainResponseDto.builder()
@@ -159,4 +162,29 @@ public class VideoServiceRelease implements VideoServiceInterface{
     public ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) {
         return null;
     }
+
+    public void uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException {
+        final String localPath = System.getProperty("user.dir") + "/files";
+
+        String memberVideoPath = localPath+"/"+memberVideo.getOriginalFilename();
+        //1. 유저 비디오를 로컬에 저장한다.
+        memberVideo.transferTo(new File(localPath+"/"+memberVideo.getOriginalFilename()));
+
+        //2. 댄서 비디오를 가져와서 저장한다.
+        AttachFile dancerVideo = fileRepository.findById(id).orElseThrow(() -> new NoSuchElementException("no video"));
+
+
+
+
+        //3. 유저 비디오와 댄서 비디오를  합친 후 로컬에 저장한다.
+
+        //4. 합쳐진 비디오를 s3에 업로드한다.
+
+
+
+    }
+
+
+
+
 }

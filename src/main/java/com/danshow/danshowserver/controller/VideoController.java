@@ -111,6 +111,7 @@ public class VideoController {
         /*
         전달받은 비디오 파일의 음원 파일 전달
          */
+
         return null;
     }
 
@@ -121,6 +122,11 @@ public class VideoController {
       /*
       전달받은 유저의 비디오를 분석하여 전달
        */
+
+        //1. 유저 비디오와 댄서 비디오를 합친다.
+        //2. 1번 DL 서버와 2번 DL 서버로 보내고 응답을 받는다.
+        //3. 받은 비디오 파일을 합쳐서 돌려준다.
+
         return null;
     }
 }

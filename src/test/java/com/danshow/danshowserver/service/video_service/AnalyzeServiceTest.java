@@ -62,10 +62,10 @@ class AnalyzeServiceTest {
     public void splitVideoWithFFmpeg() throws IOException {
 
         final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
-        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
+        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/mergedvid.mp4");
 
         String outputPath = System.getProperty("user.dir") + "/files";
-        videoFileUtils.splitFile(realVideo.getFile().getAbsolutePath(),realVideo.getFile().getName(),outputPath,2);
+        videoFileUtils.splitFile(realVideo.getFile().getAbsolutePath(),realVideo.getFile().getName(),outputPath,3);
     }
 
     @Test
@@ -107,11 +107,8 @@ class AnalyzeServiceTest {
     public void testIntegrateSideBySide() throws  Exception {
         final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
         Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
-        String outputPath = System.getProperty("user.dir") + "/files/";
+        String outputPath = System.getProperty("user.dir") + "/files/side_by_side_test.mp4";
         videoFileUtils.integrateFileSideBySide(realVideo.getFile().getAbsolutePath(), realVideo.getFile().getAbsolutePath(),outputPath);
     }
-
-
-
 
 }
