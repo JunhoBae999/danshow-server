@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,7 +62,7 @@ class VideoControllerTest {
 
         Member member = Member.builder()
                 .membership(true)
-                .email("test.test@test.test")
+                .email("test.test1@test.test")
                 .nickname("tester")
                 .name("testjunho")
                 .role(Role.MEMBER)
@@ -71,7 +72,7 @@ class VideoControllerTest {
 
         Dancer dancer = Dancer.builder()
                 .dancer_description("test dancer desc")
-                .email("dancer_test@test.test")
+                .email("dancer_test1@test.test")
                 .nickname("testdencer")
                 .name("testerdancer")
                 .role(Role.DANCER)
@@ -134,7 +135,7 @@ class VideoControllerTest {
                 "video/mp4",
                 Files.readAllBytes(realVideo.getFile().toPath()));
 
-        String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
+        String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test1@test.test",
                 1L,"idol","boy",1L));
 
         MockMultipartFile json = new MockMultipartFile("post","video_post","application/json",videoPostContent.getBytes(StandardCharsets.UTF_8));
@@ -142,7 +143,7 @@ class VideoControllerTest {
         MvcResult result = this.mockMvc.perform(multipart("/api/v1/file")
                 .file(video)
                 .file(json)
-                .header("X-AUTH-TOKEN", tokenProvider.createToken("dancer_test@test.test",Role.DANCER.getKey()))
+                .header("X-AUTH-TOKEN", tokenProvider.createToken("dancer_test1@test.test",Role.DANCER.getKey()))
                 .contentType("multipart/mixed")
                 .accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8"))
@@ -153,6 +154,16 @@ class VideoControllerTest {
         String output = result.getResponse().getContentAsString();
         System.out.println("=====resonse content======");
         System.out.println(output);
+
+        /* Get Video Post Test */
+        MvcResult vpResult = this.mockMvc.perform(get("/api/v1/post/"+output)
+                .header("X-AUTH-TOKEN", tokenProvider.createToken("dancer_test1@test.test",Role.DANCER.getKey())))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        System.out.println("vpResult = " + vpResult.getResponse().getContentAsString());
+
     }
 
 

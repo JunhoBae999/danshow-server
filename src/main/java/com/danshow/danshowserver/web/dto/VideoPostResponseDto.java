@@ -14,7 +14,7 @@ public class VideoPostResponseDto {
 
     private Long userId;
 
-    private String filePath;
+    private String musicFilePath;
 
     private Long difficulty;
 
@@ -30,6 +30,7 @@ public class VideoPostResponseDto {
 
     private String title;
 
+    private String songPath;
 
     private ImageResponseDto thumbnail;
 
@@ -41,7 +42,7 @@ public class VideoPostResponseDto {
 
         videoPostResponseDto.id = videoPost.getId();
         videoPostResponseDto.userId = videoPost.getUser().getId();
-        videoPostResponseDto.filePath = videoPost.getVideo().getFilePath();
+        videoPostResponseDto.musicFilePath = videoPost.getMusicPath();
         videoPostResponseDto.difficulty = videoPost.getDifficulty();
         videoPostResponseDto.gender = videoPost.getGender();
         videoPostResponseDto.click = videoPost.getClick();

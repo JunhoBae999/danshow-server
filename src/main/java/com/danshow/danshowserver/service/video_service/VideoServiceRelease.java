@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /*
@@ -39,7 +40,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
     private final VideoFileUtils videoFileUtils;
 
     //단순 영상 저장용. 예를들어 분석이 필요없는 단순 강의영상.
-    public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception {
+    public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception {
 
         User dancer = userRepository.findByEmail(userId);
 
@@ -54,6 +55,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage, audioPath);
         videoPostRepository.save(videoPost);
+        return videoPost.getId();
     }
 
 
@@ -150,7 +152,8 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     @Override
     public VideoPost getVideoPost(Long id) {
-        return null;
+        Optional<VideoPost> vp = videoPostRepository.findById(id);
+        return vp.orElse(null);
     }
 
     @Override
