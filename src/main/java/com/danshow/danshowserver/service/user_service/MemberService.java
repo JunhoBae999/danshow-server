@@ -1,12 +1,9 @@
-package com.danshow.danshowserver.service;
+package com.danshow.danshowserver.service.user_service;
 
 import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.config.auth.dto.SessionUser;
 import com.danshow.danshowserver.domain.user.*;
-import com.danshow.danshowserver.web.dto.user.MemberResponseDto;
-import com.danshow.danshowserver.web.dto.user.MemberSaveRequestDto;
-import com.danshow.danshowserver.web.dto.user.MemberUpdateRequestDto;
-import com.danshow.danshowserver.web.dto.user.OAuthResponseVo;
+import com.danshow.danshowserver.web.dto.user.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,8 +71,26 @@ public class MemberService {
     }
 
     @Transactional
+    public String login(String email, String password) {
+        if(checkAccount(email,password)) {
+            User user = userRepository.findByEmail(email);
+            return tokenProvider.createToken(email,user.getRoleKey());
+        }
+        return "";
+    }
+
+    public String login(LoginDto loginDto) {
+        return login(loginDto.getEmail(),loginDto.getPassword());
+    }
+
+    @Transactional
     public Long save(MemberSaveRequestDto requestDto) {
-        return memberRepository.save(requestDto.toEntity()).getId();
+        Member member = requestDto.toEntity();
+        if(memberRepository.findByEmail(member.getEmail())!=null) {
+            /* 이메일이 중복 될 경우 */
+            return -1L;
+        }
+        return memberRepository.save(member).getId();
     }
 
     @Transactional
@@ -132,6 +147,15 @@ public class MemberService {
                     .profile_picture(dancer.getDancer_picture())
                     .build();
         }
+    }
+
+    private boolean checkAccount(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if(user==null)
+            return false;
+        String encryptedPassword = user.getPassword();
+        String salt = user.getSalt();
+        return SHA256Util.getEncrypt(password,salt).equals(encryptedPassword);
     }
 
 }

@@ -44,8 +44,8 @@ public class VideoController {
         String userId = tokenProvider.getUserPk(Jwt);
 
         try {
-            videoService.save(video,videoPostSaveDto,userId);
-            return new ResponseEntity<>("success", HttpStatus.OK);
+            Long vpId = videoService.save(video,videoPostSaveDto,userId);
+            return new ResponseEntity<>(vpId.toString(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
         }

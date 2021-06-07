@@ -20,9 +20,9 @@ public class Member extends User {
     private String profile_picture;
 
     @Builder
-    public Member(String email, String nickname, String name, Role role,
+    public Member(String email, String nickname, String name, Role role, String password, String salt,
                   Boolean membership, String profile_description, String profile_picture){
-        super(email,nickname,name, role);
+        super(email,nickname,name, role,password,salt);
         this.membership = membership;
         this.profile_description = profile_description;
         this.profile_picture = profile_picture;

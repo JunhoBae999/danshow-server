@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public interface VideoServiceInterface {
 
-    public void save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception;
+    public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception;
 
     public VideoMainResponseDto mainPage();
 

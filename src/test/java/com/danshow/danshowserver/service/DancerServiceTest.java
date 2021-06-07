@@ -3,6 +3,7 @@ package com.danshow.danshowserver.service;
 import com.danshow.danshowserver.domain.user.Dancer;
 import com.danshow.danshowserver.domain.user.DancerRepository;
 import com.danshow.danshowserver.domain.user.Role;
+import com.danshow.danshowserver.service.user_service.DancerService;
 import com.danshow.danshowserver.web.dto.user.DancerUpdateRequestDto;
 import org.junit.Before;
 import org.junit.Test;
