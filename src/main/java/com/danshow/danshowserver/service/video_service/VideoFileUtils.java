@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,20 +97,25 @@ public class VideoFileUtils {
      * @param originalFileName
      * @throws IOException
      */
-    public void integrateFiles(String inputPath,String originalFileName) throws IOException {
+    public String integrateFiles(String inputPath,String originalFileName) throws IOException {
 
         String fileList = inputPath + "/" + originalFileName+".txt";
+
+        String outputPath = inputPath + "/" + originalFileName + "_merged.mp4";
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
                 .addInput(fileList)
                 .addExtraArgs("-f","concat")
                 .addExtraArgs("-safe", "0")
-                .addOutput(inputPath + "/" + originalFileName + "_merged.mp4")
+                .addOutput(outputPath)
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
         executor.createJob(builder).run();
+
+        return outputPath;
+
     }
 
     //로컬에 있는 파일로부터 썸네일 생성
@@ -117,6 +123,9 @@ public class VideoFileUtils {
 
         String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
         outputPath = outputPath + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
+
+        log.info("new ouput path : " + outputPath);
+
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
@@ -144,9 +153,13 @@ public class VideoFileUtils {
     //멀티파일과 저장할 파일 이름을 받아서 로컬에 저장하고 썸네일 생성
     public String extractThumbnail(MultipartFile video, String originalFileName) throws IOException {
         String outputPath = System.getProperty("user.dir") + "/files";
-        /* String inputPath = System.getProperty("user.dir") + "/files/"
-                +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName; */
+
+        log.info("output-path : "+outputPath);
+
         String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
+
+        log.info("inputp-path :" + inputPath);
+
         video.transferTo(new File(inputPath));
         return extractThumbnail(inputPath, originalFileName, outputPath);
     }
@@ -229,5 +242,25 @@ public class VideoFileUtils {
             fileJoinPath.mkdirs();
         }
     }
+
+    public void writeToFile(String filename, byte[] pData) {
+
+        if(pData == null){
+            return;
+        }
+
+        int lByteArraySize = pData.length;
+
+        try{
+            File lOutFile = new File(filename);
+            FileOutputStream lFileOutputStream = new FileOutputStream(lOutFile);
+            lFileOutputStream.write(pData);
+            lFileOutputStream.close();
+        }catch(Throwable e){
+            e.printStackTrace(System.out);
+        }
+    }
+
+
 
 }

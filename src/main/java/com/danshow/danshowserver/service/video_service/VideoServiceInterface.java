@@ -9,6 +9,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 
 public interface VideoServiceInterface {
@@ -25,4 +26,5 @@ public interface VideoServiceInterface {
 
     ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) throws IOException;
 
+    public File uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException;
 }

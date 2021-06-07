@@ -1,7 +1,5 @@
 package com.danshow.danshowserver.service.video_service;
 
-import com.danshow.danshowserver.domain.crew.Crew;
-import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
@@ -13,7 +11,7 @@ import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +31,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class VideoServiceRelease implements VideoServiceInterface{
 
     private final UserRepository userRepository;
@@ -70,6 +69,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
                 .filePath(filePath)
                 .originalFileName(originalFilename)
                 .build();
+
         return savedVideo;
     }
 
@@ -162,23 +162,54 @@ public class VideoServiceRelease implements VideoServiceInterface{
     }
 
 
-    public void uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException {
-        final String localPath = System.getProperty("user.dir") + "/files";
+    public File uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException {
+        final String localPath = System.getProperty("user.dir") + "/tmp";
 
         String memberVideoPath = localPath+"/"+memberVideo.getOriginalFilename();
+
+        log.info("uploadMemberTestVideo: member-test video originalFileName : " + memberVideo.getOriginalFilename());
+        log.info("uploadMemberTestVideo : member-test video created at : "+memberVideoPath);
+
         //1. 유저 비디오를 로컬에 저장한다.
-        memberVideo.transferTo(new File(localPath+"/"+memberVideo.getOriginalFilename()));
+        memberVideo.transferTo(new File(memberVideoPath));
 
         //2. 댄서 비디오를 가져와서 저장한다.
         AttachFile dancerVideo = fileRepository.findById(id).orElseThrow(() -> new NoSuchElementException("no video"));
-
-
-
+        byte[] bytes = s3Uploader.getObject(dancerVideo);
+        String temporalFilePath = System.getProperty("user.dir") + "/tmp/"+dancerVideo.getOriginalFileName();
+        videoFileUtils.writeToFile(temporalFilePath, bytes);
 
         //3. 유저 비디오와 댄서 비디오를  합친 후 로컬에 저장한다.
+        String integratedPath =
+                videoFileUtils.integrateFileSideBySide(memberVideoPath, temporalFilePath,
+                        localPath + "/integrated_" + memberVideo.getOriginalFilename());
+
+        log.info("uploadMemberTestVideo : user and member video integrated");
 
         //4. 합쳐진 비디오를 s3에 업로드한다.
+        String uploadedPath =
+                s3Uploader.upload(integratedPath, dancerVideo.getOriginalFileName(), "video");
 
+        AttachFile savedMemberTestVideo = AttachFile.builder()
+                .filePath(uploadedPath)
+                .originalFileName(memberVideo.getOriginalFilename())
+                .filename("integrated_"+memberVideo.getOriginalFilename())
+                .build();
+
+        fileRepository.save(savedMemberTestVideo);
+
+        //로컬의 파일들을 삭제한다.
+        File memberFile = new File(memberVideoPath);
+        memberFile.delete();
+
+        File dancerFile = new File(temporalFilePath);
+        dancerFile.delete();
+
+        File integratedFile = new File(integratedPath);
+
+        log.info("upload member finished. saved location : " + integratedFile.getAbsolutePath());
+
+        return integratedFile;
     }
 
     public String uploadAudio(MultipartFile video, String customFileName) throws IOException {

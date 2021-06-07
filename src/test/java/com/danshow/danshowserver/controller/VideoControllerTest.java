@@ -3,6 +3,8 @@ package com.danshow.danshowserver.controller;
 import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.user.*;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
+import com.danshow.danshowserver.service.video_service.AnalyzeService;
+import com.danshow.danshowserver.service.video_service.ApiService;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -16,12 +18,16 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +37,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -56,12 +64,20 @@ class VideoControllerTest {
     @Autowired
     TokenProvider tokenProvider;
 
+    @Autowired
+    ApiService<byte[]> apiService;
+
+
+    private Member member;
+
+    private Dancer dancer;
+
     @BeforeEach
     public  void setUp() {
 
-        Member member = Member.builder()
+        member = Member.builder()
                 .membership(true)
-                .email("test.test@test.test")
+                .email("testt.test@test.test")
                 .nickname("tester")
                 .name("testjunho")
                 .role(Role.MEMBER)
@@ -69,9 +85,9 @@ class VideoControllerTest {
 
         memberRepository.save(member);
 
-        Dancer dancer = Dancer.builder()
+        dancer = Dancer.builder()
                 .dancer_description("test dancer desc")
-                .email("dancer_test@test.test")
+                .email("dancerr_test@test.test")
                 .nickname("testdencer")
                 .name("testerdancer")
                 .role(Role.DANCER)
@@ -85,17 +101,16 @@ class VideoControllerTest {
     @Test
     @DisplayName("안무가가 영상과 포스팅을 함께 올리는 경우 테스")
     public void videoUploadTest() throws Exception {
+        String token = tokenProvider.createToken(dancer.getEmail(), Role.MEMBER.getKey());
 
+        final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+
+        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
 
         MockMultipartFile video = new MockMultipartFile("video",
                 "video.mp4",
                 "video/mp4",
-                "video test".getBytes(StandardCharsets.UTF_8));
-
-        MockMultipartFile image = new MockMultipartFile("thumbnail",
-                "image.jpeg",
-                "image/jpeg",
-                "image test".getBytes(StandardCharsets.UTF_8));
+                Files.readAllBytes(realVideo.getFile().toPath()));
 
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
                 1L, "idol", "boy", 1L));
@@ -104,8 +119,8 @@ class VideoControllerTest {
 
         MvcResult result = this.mockMvc.perform(multipart("/api/v1/file")
                 .file(video)
-                .file(image)
                 .file(json)
+                .header("X-AUTH-TOKEN", token)
                 .param("userID", "test.test@test.test")
                 .contentType("multipart/mixed")
                 .accept(MediaType.APPLICATION_JSON)
@@ -173,5 +188,22 @@ class VideoControllerTest {
     public void doUtilCheck() {
 
     }
+
+    @Test
+    void mirrorPointTest() throws Exception {
+
+        DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+        Resource resource = defaultResourceLoader.getResource("classpath:/demofile/woman.mp4");
+
+        String token = tokenProvider.createToken(member.getEmail(), Role.MEMBER.getKey());
+
+         mockMvc.perform(post("/mirror")
+                .header("X-AUTH-TOKEN", token)
+                .content(Files.readAllBytes(resource.getFile().toPath())))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+
 
 }

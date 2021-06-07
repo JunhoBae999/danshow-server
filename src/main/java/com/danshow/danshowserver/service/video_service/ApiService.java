@@ -37,5 +37,4 @@ public class ApiService<T> {
     private ResponseEntity<T> callApiEndpoint(String url, HttpMethod httpMethod, HttpHeaders httpHeaders, Object body, Class<T> clazz) {
         return restTemplate.exchange(url, httpMethod, new HttpEntity<>(body, httpHeaders), clazz);
     }
-
 }

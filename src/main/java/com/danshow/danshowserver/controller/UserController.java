@@ -78,7 +78,10 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>("Need correct information",HttpStatus.NOT_ACCEPTABLE);
         }
-
         return new ResponseEntity<>(tokenProvider.createToken(requestDto.getEmail(), Role.MEMBER.getKey()),HttpStatus.OK);
     }
+
+
+
+
 }

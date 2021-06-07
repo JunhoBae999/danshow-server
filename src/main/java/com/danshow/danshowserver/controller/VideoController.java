@@ -11,8 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.net.MalformedURLException;
 
 @Api(tags = {"2.Video"})
@@ -116,17 +113,26 @@ public class VideoController {
     }
 
     @ApiOperation(value = "유저 테스트 비디오 업로드",notes = "유저가 음원과 함께 녹화한 비디오를 업로드합니다.")
-    public ResponseEntity<UrlResource> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @ApiParam(value = "유저 테스트 비디오")
-                                                           @RequestPart MultipartFile userTestVideo)
-    {
+    public ResponseEntity<Void> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
+                                                          @ApiParam(value = "유저 테스트 비디오") @RequestPart MultipartFile userTestVideo,
+                                                          @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
       /*
       전달받은 유저의 비디오를 분석하여 전달
        */
 
         //1. 유저 비디오와 댄서 비디오를 합친다.
+        videoService.uploadMemberTestVideo(userTestVideo,id);
+
         //2. 1번 DL 서버와 2번 DL 서버로 보내고 응답을 받는다.
         //3. 받은 비디오 파일을 합쳐서 돌려준다.
 
-        return null;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @ApiOperation(value = "테스트용 미러링 엔드포인트", notes = "요청받은 데이터를 그대로 돌려줍니다.")
+    @PostMapping("/mirror")
+    public byte[] getMirror(@RequestBody byte[] videos){
+        return videos;
+    }
+
 }
