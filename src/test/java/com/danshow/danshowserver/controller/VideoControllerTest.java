@@ -64,6 +64,8 @@ class VideoControllerTest {
                 .membership(true)
                 .email("test.test1@test.test")
                 .nickname("tester")
+                .password("1")
+                .salt("1")
                 .name("testjunho")
                 .role(Role.MEMBER)
                 .build();
@@ -74,6 +76,8 @@ class VideoControllerTest {
                 .dancer_description("test dancer desc")
                 .email("dancer_test1@test.test")
                 .nickname("testdencer")
+                .password("1")
+                .salt("1")
                 .name("testerdancer")
                 .role(Role.DANCER)
                 .build();

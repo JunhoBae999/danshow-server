@@ -1,6 +1,7 @@
 package com.danshow.danshowserver.service;
 
 import com.danshow.danshowserver.domain.user.*;
+import com.danshow.danshowserver.service.user_service.MemberService;
 import com.danshow.danshowserver.web.dto.user.MemberSaveRequestDto;
 import com.danshow.danshowserver.web.dto.user.MemberUpdateRequestDto;
 import org.junit.Before;

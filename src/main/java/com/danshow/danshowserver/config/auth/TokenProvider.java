@@ -22,8 +22,8 @@ import java.util.List;
 public class TokenProvider {
 
     private String secretKey = "danshowsecretkey"; //TODO application-oauth.yml에 새로운 값으로 옮기기
-    // 토큰 유효시간 30분
-    private long tokenValidTime = 30 * 60 * 1000L;
+    // 토큰 유효시간 300분
+    private long tokenValidTime = 300 * 60 * 1000L;
     private final UserDetailsService userDetailsService;
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct

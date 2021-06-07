@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/","/css/**",
                             "/images/**","/js/**","/h2-console/**",
                             "/api/v1/file", //TODO : 테스트 끝나면 file 엔드포인트 제거
-                            "/jwt", //TODO 임시 엔드포인트
+                            "/user/sign-up","/user/login",
                             "/swagger-ui.html/**", "/webjars/**","/v2/api-docs","/swagger-resources/**") //swagger 자꾸 안되서 넣었음
                 .permitAll()
                     .antMatchers("/need-membership").hasRole("MEMBER")

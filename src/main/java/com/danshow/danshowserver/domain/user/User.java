@@ -26,6 +26,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(length = 30, nullable = false)
     private String email;
 
+    private String password;
+    private String salt;
+
     @Column(length = 20, nullable = false)
     private String nickname;
 
@@ -36,11 +39,13 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    public User(String email, String nickname, String name, Role role) {
+    public User(String email, String nickname, String name, Role role, String password, String salt) {
        this.email = email;
        this.nickname = nickname;
        this.name = name;
        this.role = role;
+       this.password = password;
+       this.salt = salt;
     }
 
     public String getRoleKey() {
@@ -56,7 +61,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override

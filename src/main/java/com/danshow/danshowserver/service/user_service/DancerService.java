@@ -1,4 +1,4 @@
-package com.danshow.danshowserver.service;
+package com.danshow.danshowserver.service.user_service;
 
 import com.danshow.danshowserver.config.auth.dto.SessionUser;
 import com.danshow.danshowserver.domain.user.*;
