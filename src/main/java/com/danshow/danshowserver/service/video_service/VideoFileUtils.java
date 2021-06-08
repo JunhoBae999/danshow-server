@@ -160,9 +160,11 @@ public class VideoFileUtils {
 
         log.info("output-path : "+outputPath);
 
+        createDirectory(outputPath);
+
         String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
 
-        log.info("inputp-path :" + inputPath);
+        log.info("input-path : " + inputPath);
 
         video.transferTo(new File(inputPath));
         return extractThumbnail(inputPath, originalFileName, outputPath);

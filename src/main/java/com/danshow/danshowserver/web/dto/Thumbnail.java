@@ -17,6 +17,6 @@ public class Thumbnail {
         this.id = videoPostId;
         this.image_url =image_url;
         this.title = title;
-        this.thumbnailText = thumbnailText.substring(0,100); // 앞의 100글자만 저장
+        this.thumbnailText = thumbnailText;
     }
 }

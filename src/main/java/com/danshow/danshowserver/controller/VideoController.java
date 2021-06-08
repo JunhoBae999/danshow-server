@@ -45,7 +45,6 @@ public class VideoController {
                                      @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
                                      @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt)  {
         String email = tokenProvider.getUserPk(Jwt);
-
         try {
             Long videoPostId = videoService.save(video,videoPostSaveDto,email);
             return new ResponseEntity<>(videoPostId.toString(), HttpStatus.OK);
