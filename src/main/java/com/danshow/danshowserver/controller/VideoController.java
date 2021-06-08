@@ -7,6 +7,7 @@ import com.danshow.danshowserver.service.video_service.AnalyzeService;
 import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
 import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
+import com.danshow.danshowserver.web.dto.video.MemberTestVideoResponseDto;
 import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 @Api(tags = {"2.Video"})
 @RestController
@@ -42,12 +44,11 @@ public class VideoController {
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
                                      @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
                                      @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt)  {
-
-        String userId = tokenProvider.getUserPk(Jwt);
+        String email = tokenProvider.getUserPk(Jwt);
 
         try {
-            Long vpId = videoService.save(video,videoPostSaveDto,userId);
-            return new ResponseEntity<>(vpId.toString(), HttpStatus.OK);
+            Long videoPostId = videoService.save(video,videoPostSaveDto,email);
+            return new ResponseEntity<>(videoPostId.toString(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,12 +107,8 @@ public class VideoController {
 
     @ApiOperation(value = "유저 테스트 비디오 선택", notes = "유저가 테스트할 비디오를 선택하는 경우 음원파일을 제공합니다.")
     @GetMapping("/api/v1/videos/{id}/music")
-    public ResponseEntity<UrlResource> getSelectedVideoMp4(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id) {
-        /*
-        전달받은 비디오 파일의 음원 파일 전달
-         */
-
-        return null;
+    public ResponseEntity<String> getSelectedVideoMp4(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id) {
+        return new ResponseEntity<>(videoService.getMusicUrl(id),HttpStatus.OK);
     }
 
     @ApiOperation(value = "유저 테스트 비디오 업로드",notes = "유저가 음원과 함께 녹화한 비디오를 업로드합니다.")
@@ -132,6 +129,14 @@ public class VideoController {
     @PostMapping("/mirror")
     public byte[] getMirror(@RequestBody byte[] videos){
         return videos;
+    }
+
+    @ApiOperation(value = "멤버 테스트 비디오 목록", notes = "유저의 테스트 비디오 목록을 넘겨줍니다.")
+    @GetMapping("api/v1/videos/test")
+    public ResponseEntity<List<MemberTestVideoResponseDto>> getMemberTestVideoList(
+            @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+        String email = tokenProvider.getUserPk(Jwt);
+        return new ResponseEntity<>(videoService.getMemberTestVideoList(email),HttpStatus.OK);
     }
 
 }

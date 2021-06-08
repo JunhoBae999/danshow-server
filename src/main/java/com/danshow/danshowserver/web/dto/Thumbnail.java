@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class Thumbnail {
+    private Long id;
     private String image_url;
     private String title;
     private String thumbnailText;
 
     @Builder
-    public Thumbnail(String image_url, String title, String thumbnailText) {
+    public Thumbnail(Long videoPostId, String image_url, String title, String thumbnailText) {
+        this.id = videoPostId;
         this.image_url =image_url;
         this.title = title;
         this.thumbnailText = thumbnailText.substring(0,100); // 앞의 100글자만 저장

@@ -28,7 +28,7 @@ public class Member extends User {
         this.profile_picture = profile_picture;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "member")
     private List<MemberTestVideoPost> memberTestVideoList = new ArrayList<MemberTestVideoPost>();
 
     @OneToMany(mappedBy = "member")

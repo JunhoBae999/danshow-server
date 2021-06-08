@@ -3,6 +3,7 @@ package com.danshow.danshowserver.service.video_service;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
+import com.danshow.danshowserver.web.dto.video.MemberTestVideoResponseDto;
 import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public interface VideoServiceInterface {
 
@@ -27,4 +29,8 @@ public interface VideoServiceInterface {
     ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) throws IOException;
 
     public File uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException;
+
+    public List<MemberTestVideoResponseDto> getMemberTestVideoList(String email);
+
+    public String getMusicUrl(Long id);
 }

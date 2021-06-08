@@ -1,14 +1,18 @@
 package com.danshow.danshowserver.service.video_service;
 
 import com.danshow.danshowserver.aspect.TimeCheck;
+import com.danshow.danshowserver.domain.user.Member;
+import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.FileRepository;
+import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.web.dto.Thumbnail;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
+import com.danshow.danshowserver.web.dto.video.MemberTestVideoResponseDto;
 import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /*
 서버 배포용 service
@@ -37,6 +42,7 @@ import java.util.UUID;
 public class VideoServiceRelease implements VideoServiceInterface{
 
     private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final VideoPostRepository videoPostRepository;
     private final FileRepository fileRepository;
     private final S3Uploader s3Uploader;
@@ -144,6 +150,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     public Thumbnail makeThumbnail(VideoPost videoPost) {
         return Thumbnail.builder()
+                .videoPostId(videoPost.getId())
                 .title(videoPost.getTitle())
                 .image_url(videoPost.getImage().getFilePath())
                 .thumbnailText(videoPost.getDescription())
@@ -234,5 +241,30 @@ public class VideoServiceRelease implements VideoServiceInterface{
         }
 
         return filePath;
+    }
+
+    public List<MemberTestVideoResponseDto> getMemberTestVideoList(String email) {
+        Member member = memberRepository.findByEmail(email);
+        List<MemberTestVideoPost> memberTestVideoList = member.getMemberTestVideoList();
+        //각 MemberTestVideoPost를 Dto로 변환해서 리스트를 반환
+        return memberTestVideoList.stream().map(s -> memberTestVideoPostToDto(s)).collect(Collectors.toList());
+    }
+
+    private MemberTestVideoResponseDto memberTestVideoPostToDto(MemberTestVideoPost post) {
+        Long id = post.getId();
+        VideoPost videoPost = post.getVideoPost();
+        return MemberTestVideoResponseDto.builder()
+                .title(videoPost.getTitle())
+                .filePath(videoPost.getVideo().getFilePath())
+                .score(post.getScore())
+                .build();
+    }
+
+    public String getMusicUrl(Long id) {
+        Optional<VideoPost> video = videoPostRepository.findById(id);
+        if(video.isPresent()) {
+            return video.get().getMusicPath();
+        }
+        return "";
     }
 }

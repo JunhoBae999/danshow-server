@@ -1,13 +1,13 @@
 package com.danshow.danshowserver.domain.video.post;
 
+import com.danshow.danshowserver.domain.user.Member;
+import com.danshow.danshowserver.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Table(name = "member_test_video_post")
@@ -16,4 +16,21 @@ import javax.persistence.Table;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class MemberTestVideoPost extends VideoPost{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="member_test_video_id")
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "video_post_id")
+    private VideoPost videoPost;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Member member;
+
+    private Long score;
+
+
 }
