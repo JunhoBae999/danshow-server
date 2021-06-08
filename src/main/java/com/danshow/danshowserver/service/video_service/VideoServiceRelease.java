@@ -95,7 +95,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
                 .filePath(filePath)
                 .originalFileName(originalFilename)
                 .build();
-
+        
         return savedVideo;
     }
 
@@ -143,7 +143,12 @@ public class VideoServiceRelease implements VideoServiceInterface{
                 .filePath(filePath)
                 .originalFileName(originalFilename)
                 .build();
-
+        //후삭제
+        File deleteFile = new File(thumbnailPath);
+        if(deleteFile.exists()) {
+            deleteFile.delete();
+        }
+        
         return savedImage;
     }
 
@@ -154,6 +159,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
             // 최대 6개까지만 리스트에 담기d
             thumbnailList.add(makeThumbnail(all.get(i)));
         }
+        log.info("size: "+"thumbnailList.size()");
         return VideoMainResponseDto.builder()
                 .videoThumbnailList(thumbnailList)
                 .build();
@@ -243,6 +249,13 @@ public class VideoServiceRelease implements VideoServiceInterface{
         System.out.println("fileName!! = " + fileName);
         //S3업로드 된 주소
         String filePath = s3Uploader.upload(audioPath,fileName,"audio");
+
+        //업로드 후 임시파일 삭제
+        File deleteFile = new File(audioPath);
+
+        if(deleteFile.exists()) {
+            deleteFile.delete();
+        }
 
         return filePath;
     }
