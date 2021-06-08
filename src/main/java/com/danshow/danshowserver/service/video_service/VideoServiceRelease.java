@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -184,12 +185,6 @@ public class VideoServiceRelease implements VideoServiceInterface{
         return vp.orElse(null);
     }
 
-    @Override
-    public ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) {
-        return null;
-    }
-
-
     @TimeCheck
     public File uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException {
         final String localPath = System.getProperty("user.dir") + "/tmp";
@@ -283,5 +278,25 @@ public class VideoServiceRelease implements VideoServiceInterface{
             return video.get().getMusicPath();
         }
         return "";
+    }
+
+    @Override
+    public ResourceRegion resourceRegion(UrlResource video, HttpHeaders headers) throws IOException{
+
+        final long chunkSize = 1000000L;
+        long contentLength = video.contentLength();
+
+        HttpRange httpRange = headers.getRange().stream().findFirst().get();
+        if(httpRange != null) {
+            long start = httpRange.getRangeStart(contentLength);
+            long end = httpRange.getRangeEnd(contentLength);
+            long ragneLength = Long.min(chunkSize,end-start+1);
+            return new ResourceRegion(video,start,ragneLength);
+        }else {
+            long rangeLength = Long.min(chunkSize,contentLength);
+            return new ResourceRegion(video,0,rangeLength);
+        }
+
+
     }
 }
