@@ -158,17 +158,6 @@ class AnalyzeServiceTest {
         final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
         Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
 
-        Mono<byte[]> firstFile = analyzeService.getSecondFile(realVideo.getFile(),token);
-
-        String testRepo = System.getProperty("user.dir")+"/files/test_"+realVideo.getFilename();
-
-        System.out.println(testRepo);
-
-        firstFile.subscribe(
-                v -> {
-                    videoFileUtils.writeToFile(testRepo,v);
-                }
-        );
     }
 
 }

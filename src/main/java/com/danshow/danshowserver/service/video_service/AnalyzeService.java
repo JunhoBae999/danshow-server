@@ -1,26 +1,21 @@
 package com.danshow.danshowserver.service.video_service;
 
-import com.danshow.danshowserver.domain.user.Member;
-import com.danshow.danshowserver.domain.user.Role;
 import com.danshow.danshowserver.web.dto.response.Response;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
-import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +42,10 @@ public class AnalyzeService {
         .build();// to unlimited memory size .build();
 
     WebClient webClient = WebClient.builder()
+            .exchangeStrategies(exchangeStrategies)
+            .build();
+
+    WebClient secondWebClient = WebClient.builder()
             .exchangeStrategies(exchangeStrategies)
             .build();
 
@@ -91,17 +90,8 @@ public class AnalyzeService {
         String originalFileNameWithoutExtension =
                 memberTestVideo.getOriginalFilename().substring(0,memberTestVideo.getOriginalFilename().indexOf("."));
 
-        /*
-        fetchVideos(firstFils, secondFile)
-                .subscribe(tup -> {
-                    byte[] t1 = tup.getT1();
-                    byte[] t2 = tup.getT2();
-                    videoFileUtils.writeToFile(firstFilePath,t1);
-                    videoFileUtils.writeToFile(secondFilePath,t2);
-                });
-         */
-
-        Tuple2<byte[], byte[]> fetchVideos = fetchVideos(firstFils, secondFile,token);
+        Tuple2<byte[], byte[]> fetchVideos = fetchVideos(Files.readAllBytes(firstFils.toPath()),
+                Files.readAllBytes(secondFile.toPath()), token);
 
         videoFileUtils.writeToFile(firstFilePath, fetchVideos.getT1());
         videoFileUtils.writeToFile(secondFilePath, fetchVideos.getT2());
@@ -240,9 +230,7 @@ public class AnalyzeService {
                 .bodyToMono(byte[].class);
     }
 
-    public Mono<byte[]> getFirstFile(File file, String token) throws IOException {
-
-        byte[] bytes = Files.readAllBytes(file.toPath());
+    public Mono<byte[]> getFirstFile(byte[] bytes, String token) throws IOException {
 
         return webClient
                 .post()
@@ -252,25 +240,32 @@ public class AnalyzeService {
                 .bodyValue(bytes)
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel())
+                .map(x -> {
+                    log.info("async method call : getFirst method called");
+                    try { Thread.sleep(3000); } catch (InterruptedException e) {
+                    }
+                    return x;
+                });
     }
 
     public Mono<byte[]> getSecondFile(File file) throws IOException {
 
         byte[] bytes = Files.readAllBytes(file.toPath());
 
-        return webClient
+        return secondWebClient
                 .post()
                 .uri(DL_SERVER_URL2)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel());
     }
 
-    public Mono<byte[]> getSecondFile(File file, String token) throws IOException {
+    public Mono<byte[]> getSecondFile(byte[] bytes, String token) throws IOException {
 
-        byte[] bytes = Files.readAllBytes(file.toPath());
 
         return webClient
                 .post()
@@ -280,10 +275,18 @@ public class AnalyzeService {
                 .bodyValue(bytes)
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel())
+                .map(x -> {
+                    log.info("async method call : getSecondFile method called");
+                    try { Thread.sleep(3000); } catch (InterruptedException e) {
+                    }
+                    return x;
+                });
     }
 
-    public Tuple2<byte[], byte[]> fetchVideos(File firstFile, File secondFile,String token) throws IOException {
-        return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token)).block();
+    public Tuple2<byte[], byte[]> fetchVideos(byte[] firstFile, byte[] secondFile, String token) throws IOException {
+        return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token))
+                .block();
     }
 }
