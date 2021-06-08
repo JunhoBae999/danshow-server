@@ -51,6 +51,9 @@ public class VideoPost {
 
     private String musicPath;
 
+    @OneToOne(mappedBy = "videoPost")
+    private MemberTestVideoPost memberTestVideoPost;
+
     public void setVideo(AttachFile video) {
         this.video = video;
     }
