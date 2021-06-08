@@ -65,6 +65,11 @@ public class VideoServiceRelease implements VideoServiceInterface{
         String inputPath = outputPath + "/" +uuidFileName;
 
         //임시저장
+        File fileJoinPath = new File(outputPath);
+        if (!fileJoinPath.exists()) {
+            fileJoinPath.mkdirs();
+        }
+        
         video.transferTo(new File(inputPath));
 
         //음악 업로드
@@ -160,7 +165,6 @@ public class VideoServiceRelease implements VideoServiceInterface{
             // 최대 6개까지만 리스트에 담기d
             thumbnailList.add(makeThumbnail(all.get(i)));
         }
-        log.info("size: "+"thumbnailList.size()");
         return VideoMainResponseDto.builder()
                 .videoThumbnailList(thumbnailList)
                 .build();
@@ -263,11 +267,9 @@ public class VideoServiceRelease implements VideoServiceInterface{
     }
 
     private MemberTestVideoResponseDto memberTestVideoPostToDto(MemberTestVideoPost post) {
-        Long id = post.getId();
-        VideoPost videoPost = post.getVideoPost();
         return MemberTestVideoResponseDto.builder()
-                .title(videoPost.getTitle())
-                .filePath(videoPost.getVideo().getFilePath())
+                .title(post.getTitle())
+                .filePath(post.getVideo().getFilePath())
                 .score(post.getScore())
                 .build();
     }
@@ -296,7 +298,5 @@ public class VideoServiceRelease implements VideoServiceInterface{
             long rangeLength = Long.min(chunkSize,contentLength);
             return new ResourceRegion(video,0,rangeLength);
         }
-
-
     }
 }

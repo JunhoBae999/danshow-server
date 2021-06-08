@@ -52,9 +52,6 @@ public class VideoPost {
     @Column(length = 600)
     private String musicPath;
 
-    @OneToOne(mappedBy = "videoPost")
-    private MemberTestVideoPost memberTestVideoPost;
-
     public void setVideo(AttachFile video) {
         this.video = video;
     }

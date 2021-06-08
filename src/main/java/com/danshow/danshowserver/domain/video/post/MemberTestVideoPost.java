@@ -17,15 +17,6 @@ import javax.persistence.*;
 @SuperBuilder
 public class MemberTestVideoPost extends VideoPost{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="member_test_video_id")
-    private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "video_post_id")
-    private VideoPost videoPost;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Member member;
