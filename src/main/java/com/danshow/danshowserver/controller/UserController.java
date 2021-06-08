@@ -72,7 +72,6 @@ public class UserController {
     @ApiOperation(value = "회원가입", notes = "넘겨 준 정보로 회원가입을 합니다.")
     @PostMapping("user/sign-up")
     public ResponseEntity<String> save(@RequestBody MemberSaveRequestDto requestDto) {
-
         try {
             Long result = memberService.save(requestDto);
             if(result < 0) {

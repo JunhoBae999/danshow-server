@@ -27,7 +27,7 @@ public class AttachFile extends BaseTimeEntity {
     @Column(nullable = false)
     private String filename;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 600)
     private String filePath;
 
     @ManyToOne

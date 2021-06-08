@@ -33,4 +33,5 @@ public interface VideoServiceInterface {
     public List<MemberTestVideoResponseDto> getMemberTestVideoList(String email);
 
     public String getMusicUrl(Long id);
+
 }

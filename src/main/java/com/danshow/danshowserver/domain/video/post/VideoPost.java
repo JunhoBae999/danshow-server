@@ -49,10 +49,8 @@ public class VideoPost {
 
     private String songName;
 
+    @Column(length = 600)
     private String musicPath;
-
-    @OneToOne(mappedBy = "videoPost")
-    private MemberTestVideoPost memberTestVideoPost;
 
     public void setVideo(AttachFile video) {
         this.video = video;
@@ -80,6 +78,7 @@ public class VideoPost {
         videoPost.difficulty = videoPost.getDifficulty();
         videoPost.video = requestVideo;
         videoPost.musicPath = musicPath;
+        videoPost.image = requestImage;
 
         requestVideo.setVideoPost(videoPost);
         requestVideo.setUser(user);
