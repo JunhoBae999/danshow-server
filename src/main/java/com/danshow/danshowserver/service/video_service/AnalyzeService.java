@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.service.video_service;
 
+import com.danshow.danshowserver.aspect.TimeCheck;
 import com.danshow.danshowserver.web.dto.response.Response;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -65,20 +67,19 @@ public class AnalyzeService {
      * 파일을 어떤 경로에서 가져오느냐에 따른 차이. 현재는 s3로 가정 하고 url resource 사용. s3 util을 쓴다면 더 쉬울 것으로 예상
      */
 
+    @TimeCheck
     public String getAnalyzedVideo(MultipartFile memberTestVideo, Long id,String token) throws IOException {
 
         //1. 요청받은 비디오 파일을 요청받은 Id의 파일과 함께 합친 후 s3에 업로드한다.
         File savedIntegratedFile = videoServiceInterface.uploadMemberTestVideo(memberTestVideo, id);
 
-        String localSavePath = System.getProperty("user.dir")+"/tmp";
-
         //2. 비디오 파일을 나눈다. (A,B)
+        String localSavePath = System.getProperty("user.dir")+"/tmp";
         List<String> fileList =
                 videoFileUtils.splitFile(savedIntegratedFile.getAbsolutePath(),
                         savedIntegratedFile.getName(),
                         localSavePath,
                         2);
-
 
         //3-1. A,B를 DL_SERVER_URL1으로 비동기로 보낸다. (분석이 된 영상을 응답받는다.)
         File firstFils = new File(fileList.get(0));
@@ -111,7 +112,6 @@ public class AnalyzeService {
         String video = s3Uploader.upload(analyzedFile.getAbsolutePath(),analyzedFile.getName(),"video");
 
         log.info("video path : " + video);
-
         //5. 합쳐진 비디오 파일을 돌려준다.
         return video;
     }
@@ -244,8 +244,6 @@ public class AnalyzeService {
                 .subscribeOn(Schedulers.parallel())
                 .map(x -> {
                     log.info("async method call : getFirst method called");
-                    try { Thread.sleep(3000); } catch (InterruptedException e) {
-                    }
                     return x;
                 });
     }
@@ -279,8 +277,6 @@ public class AnalyzeService {
                 .subscribeOn(Schedulers.parallel())
                 .map(x -> {
                     log.info("async method call : getSecondFile method called");
-                    try { Thread.sleep(3000); } catch (InterruptedException e) {
-                    }
                     return x;
                 });
     }

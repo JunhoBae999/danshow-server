@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.service.video_service;
 
+import com.danshow.danshowserver.aspect.TimeCheck;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
@@ -165,6 +166,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
     }
 
 
+    @TimeCheck
     public File uploadMemberTestVideo(MultipartFile memberVideo, Long id) throws IOException {
         final String localPath = System.getProperty("user.dir") + "/tmp";
 

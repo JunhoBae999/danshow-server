@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.service.video_service;
 
+import com.danshow.danshowserver.aspect.TimeCheck;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -49,6 +50,7 @@ public class VideoFileUtils {
         }
     }
 
+    @TimeCheck
     public List<String> splitFile(String inputPath, String originalFileName, String outputPath , Integer chunkNumber) throws IOException {
         FFmpegProbeResult probeResult = fFprobe.probe(inputPath);
 
@@ -97,6 +99,7 @@ public class VideoFileUtils {
      * @param originalFileName
      * @throws IOException
      */
+    @TimeCheck
     public String integrateFiles(String inputPath,String originalFileName) throws IOException {
 
         String fileList = inputPath + "/" + originalFileName+".txt";
@@ -244,6 +247,7 @@ public class VideoFileUtils {
         }
     }
 
+    @TimeCheck
     public void writeToFile(String filename, byte[] pData) {
 
         if(pData == null){
