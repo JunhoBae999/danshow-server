@@ -69,6 +69,7 @@ public class CrewService {
 
     public Thumbnail makeThumbnail(Crew crew) {
         return Thumbnail.builder()
+                .videoPostId(crew.getId())
                 .title(crew.getTitle())
                 .image_url(crew.getCrew_profile_image())
                 .thumbnailText(crew.getDescription())
