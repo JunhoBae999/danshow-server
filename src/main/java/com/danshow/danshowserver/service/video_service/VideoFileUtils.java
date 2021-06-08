@@ -125,7 +125,8 @@ public class VideoFileUtils {
     //로컬에 있는 파일로부터 썸네일 생성
     public String extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
 
-        String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
+        String originalFileNameWithoutExtension =
+                originalFileName.substring(0,originalFileName.lastIndexOf("."));
         outputPath = outputPath + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
 
         log.info("new ouput path : " + outputPath);
@@ -237,6 +238,9 @@ public class VideoFileUtils {
     public String extractAudio(MultipartFile video, String originalFileName) throws IOException {
         String outputPath = System.getProperty("user.dir") + "/files";
         String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
+        createDirectory(outputPath);
+        log.info("outputPath: " + outputPath);
+        log.info("inputPath: " + inputPath);
         video.transferTo(new File(inputPath));
         return extractAudio(inputPath, originalFileName, outputPath);
     }

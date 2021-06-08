@@ -52,15 +52,32 @@ public class VideoServiceRelease implements VideoServiceInterface{
     public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception {
 
         User dancer = userRepository.findByEmail(userId);
-
+        
         //uuid 붙인 파일명 생성
         UUID uuid = UUID.randomUUID();
         String uuidFileName = uuid+"-"+video.getOriginalFilename();
-
+        //비디오 업로드
         AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
-        AttachFile uploadImage = uploadThumbnail(video, uuidFileName);
 
-        String audioPath = uploadAudio(video,uuidFileName); //mp3 추출 후 업로드 로직
+        String originalFileName = video.getOriginalFilename();
+        String outputPath = System.getProperty("user.dir") + "/files";
+        String inputPath = outputPath + "/" +uuidFileName;
+
+        //임시저장
+        video.transferTo(new File(inputPath));
+
+        //음악 업로드
+        String audioPath = uploadAudio(inputPath, uuidFileName,outputPath);
+        //썸네일 업로드
+        AttachFile uploadImage = uploadThumbnail(inputPath, uuidFileName,outputPath,originalFileName);
+
+
+        //업로드 후 임시파일 삭제
+        File deleteFile = new File(inputPath);
+
+        if(deleteFile.exists()) {
+            deleteFile.delete();
+        }
 
         VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage, audioPath);
         videoPostRepository.save(videoPost);
@@ -111,8 +128,9 @@ public class VideoServiceRelease implements VideoServiceInterface{
         return s3FilePathList;
     }
 
-    public AttachFile uploadThumbnail(MultipartFile video, String customFileName) throws IOException {
-        String thumbnailPath = videoFileUtils.extractThumbnail(video,customFileName);
+    public AttachFile uploadThumbnail(String inputPath, String customFileName,
+                                      String outputPath,String originalFilename) throws IOException {
+        String thumbnailPath = videoFileUtils.extractThumbnail(inputPath,customFileName,outputPath);
         String fileName = thumbnailPath
                 .substring(thumbnailPath
                         .lastIndexOf("/")+1);
@@ -123,15 +141,8 @@ public class VideoServiceRelease implements VideoServiceInterface{
         AttachFile savedImage = AttachFile.builder()
                 .filename(fileName)
                 .filePath(filePath)
-                .originalFileName(video.getOriginalFilename())
+                .originalFileName(originalFilename)
                 .build();
-
-        //썸네일 업로드 후 임시파일 삭제
-        File deleteFile = new File(thumbnailPath);
-
-        if(deleteFile.exists()) {
-            deleteFile.delete();
-        }
 
         return savedImage;
     }
@@ -224,21 +235,14 @@ public class VideoServiceRelease implements VideoServiceInterface{
         return integratedFile;
     }
 
-    public String uploadAudio(MultipartFile video, String customFileName) throws IOException {
-        String audioPath = videoFileUtils.extractAudio(video,customFileName);
+    public String uploadAudio(String inputPath, String customFileName, String outputPath) throws IOException {
+        String audioPath = videoFileUtils.extractAudio(inputPath,customFileName,outputPath);
         String fileName = audioPath
                 .substring(audioPath
                         .lastIndexOf("/")+1);
         System.out.println("fileName!! = " + fileName);
         //S3업로드 된 주소
         String filePath = s3Uploader.upload(audioPath,fileName,"audio");
-
-        //오디오 업로드 후 임시파일 삭제
-        File deleteFile = new File(audioPath);
-
-        if(deleteFile.exists()) {
-            deleteFile.delete();
-        }
 
         return filePath;
     }
