@@ -84,7 +84,7 @@ public class VideoFileUtils {
 
             log.info("split done");
 
-            createTxt(totalPath, outputPath, originalFileNameWithoutExtensionWithUUID);
+            //createTxt(totalPath, outputPath, originalFileNameWithoutExtensionWithUUID);
 
             splitFileList.add(totalPath);
             startPoint += streamSize;
@@ -101,7 +101,7 @@ public class VideoFileUtils {
 
         String fileList = inputPath + "/" + originalFileName+".txt";
 
-        String outputPath = inputPath + "/" + originalFileName + "_merged.mp4";
+        String outputPath = inputPath + "/" + originalFileName + "_final_ver.mp4";
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
@@ -114,6 +114,7 @@ public class VideoFileUtils {
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
         executor.createJob(builder).run();
 
+        log.info("final integrate phase complete, output path  : " + outputPath);
         return outputPath;
 
     }

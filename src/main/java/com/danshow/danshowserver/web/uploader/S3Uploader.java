@@ -29,6 +29,7 @@ import java.util.UUID;
 
 @Service
 @NoArgsConstructor
+@Slf4j
 public class S3Uploader {
     private AmazonS3 s3Client;
 
@@ -70,6 +71,7 @@ public class S3Uploader {
         s3SavePath = s3SavePath + "/" + fileName;
         s3Client.putObject(new PutObjectRequest(bucket, s3SavePath, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
+        log.info("s3 uploaded complete");
         return s3Client.getUrl(bucket, s3SavePath).toString();
     }
 
@@ -77,6 +79,8 @@ public class S3Uploader {
         s3SavePath = s3SavePath + "/" + file.getName();
         s3Client.putObject(new PutObjectRequest(bucket, s3SavePath, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        log.info("s3 uploaded complete");
         return s3Client.getUrl(bucket, s3SavePath).toString();
     }
 

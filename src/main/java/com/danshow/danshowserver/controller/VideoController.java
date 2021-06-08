@@ -3,6 +3,7 @@ package com.danshow.danshowserver.controller;
 import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
+import com.danshow.danshowserver.service.video_service.AnalyzeService;
 import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
 import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
@@ -27,6 +28,7 @@ public class VideoController {
 
     private final VideoServiceInterface videoService;
     private final TokenProvider tokenProvider;
+    private final AnalyzeService analyzeService;
 
     /**
      * 댄서가 비디오를 업로드 하는 경우입니다. 업로드 할 시 그대로 저장되며, 음원 파일이 추출됩니다.
@@ -113,19 +115,16 @@ public class VideoController {
     }
 
     @ApiOperation(value = "유저 테스트 비디오 업로드",notes = "유저가 음원과 함께 녹화한 비디오를 업로드합니다.")
+    @PostMapping("/api/v1/member-test/{id}")
     public ResponseEntity<Void> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
                                                           @ApiParam(value = "유저 테스트 비디오") @RequestPart MultipartFile userTestVideo,
                                                           @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
-      /*
+
+        /*
       전달받은 유저의 비디오를 분석하여 전달
        */
 
-        //1. 유저 비디오와 댄서 비디오를 합친다.
-        videoService.uploadMemberTestVideo(userTestVideo,id);
-
-        //2. 1번 DL 서버와 2번 DL 서버로 보내고 응답을 받는다.
-        //3. 받은 비디오 파일을 합쳐서 돌려준다.
-
+        analyzeService.getAnalyzedVideo(userTestVideo,id,Jwt);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

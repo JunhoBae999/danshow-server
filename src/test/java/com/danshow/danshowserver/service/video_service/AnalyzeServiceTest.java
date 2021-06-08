@@ -137,8 +137,6 @@ class AnalyzeServiceTest {
                 Files.readAllBytes(Path.of(realVideo.getFile().getAbsolutePath())));
 
         //mocking needed.
-        String analyzedVideoPath = analyzeService.getAnalyzedVideo(mockMultipartFile,4L);
-        System.out.println(analyzedVideoPath);
     }
 
     @Test

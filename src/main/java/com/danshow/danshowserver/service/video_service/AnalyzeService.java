@@ -5,6 +5,7 @@ import com.danshow.danshowserver.domain.user.Role;
 import com.danshow.danshowserver.web.dto.response.Response;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -12,6 +13,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -24,27 +26,36 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AnalyzeService {
 
-    private static final String DL_SERVER_URL1 = "http://localhost:8081/mirror";
+    private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
 
-    private static final String DL_SERVER_URL2 = "http://localhost:8081/mirror";
+    private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
 
-    private VideoServiceInterface videoServiceInterface;
+    private final VideoServiceInterface videoServiceInterface;
 
-    private VideoFileUtils videoFileUtils;
+    private final VideoFileUtils videoFileUtils;
 
-    private ApiService<Response> apiService;
+    private final ApiService<Response> apiService;
 
-    WebClient webClient = WebClient.create();
+    private final S3Uploader s3Uploader;
 
-    private S3Uploader s3Uploader;
+    ExchangeStrategies exchangeStrategies =
+            ExchangeStrategies.builder()
+                    .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
+        .build();// to unlimited memory size .build();
+
+    WebClient webClient = WebClient.builder()
+            .exchangeStrategies(exchangeStrategies)
+            .build();
 
     @Autowired
-    public AnalyzeService(ApiService<Response> apiService, VideoServiceInterface videoServiceInterface, VideoFileUtils videoFileUtils) {
+    public AnalyzeService(ApiService<Response> apiService, VideoServiceInterface videoServiceInterface, VideoFileUtils videoFileUtils, S3Uploader s3Uploader) {
         this.videoServiceInterface = videoServiceInterface;
         this.apiService = apiService;
         this.videoFileUtils = videoFileUtils;
+        this.s3Uploader = s3Uploader;
     }
 
     /**
@@ -55,7 +66,7 @@ public class AnalyzeService {
      * 파일을 어떤 경로에서 가져오느냐에 따른 차이. 현재는 s3로 가정 하고 url resource 사용. s3 util을 쓴다면 더 쉬울 것으로 예상
      */
 
-    public String getAnalyzedVideo(MultipartFile memberTestVideo, Long id) throws IOException {
+    public String getAnalyzedVideo(MultipartFile memberTestVideo, Long id,String token) throws IOException {
 
         //1. 요청받은 비디오 파일을 요청받은 Id의 파일과 함께 합친 후 s3에 업로드한다.
         File savedIntegratedFile = videoServiceInterface.uploadMemberTestVideo(memberTestVideo, id);
@@ -90,18 +101,26 @@ public class AnalyzeService {
                 });
          */
 
-        Tuple2<byte[], byte[]> fetchVideos = fetchVideos(firstFils, secondFile);
+        Tuple2<byte[], byte[]> fetchVideos = fetchVideos(firstFils, secondFile,token);
 
         videoFileUtils.writeToFile(firstFilePath, fetchVideos.getT1());
         videoFileUtils.writeToFile(secondFilePath, fetchVideos.getT2());
 
         //4. 3단계가 모두 완료가 된다면, 비디오 파일을 다시 순서에 맞게 합친다.
-        videoFileUtils.createTxt(firstFilePath,localSavePath,memberTestVideo.getOriginalFilename());
-        videoFileUtils.createTxt(secondFilePath,localSavePath,memberTestVideo.getOriginalFilename());
+        videoFileUtils.createTxt(firstFilePath,localSavePath,originalFileNameWithoutExtension);
+        videoFileUtils.createTxt(secondFilePath,localSavePath,originalFileNameWithoutExtension);
+
+        firstFils.delete();
+        secondFile.delete();
 
         File analyzedFile = new File(videoFileUtils.integrateFiles(localSavePath,originalFileNameWithoutExtension));
 
-        String video = s3Uploader.upload(analyzedFile, "video");
+        log.info("final file before s3 path : " + analyzedFile.getAbsolutePath());
+        log.info("final file before s3 filename : " + analyzedFile.getName());
+
+        String video = s3Uploader.upload(analyzedFile.getAbsolutePath(),analyzedFile.getName(),"video");
+
+        log.info("video path : " + video);
 
         //5. 합쳐진 비디오 파일을 돌려준다.
         return video;
@@ -221,6 +240,21 @@ public class AnalyzeService {
                 .bodyToMono(byte[].class);
     }
 
+    public Mono<byte[]> getFirstFile(File file, String token) throws IOException {
+
+        byte[] bytes = Files.readAllBytes(file.toPath());
+
+        return webClient
+                .post()
+                .uri(DL_SERVER_URL1)
+                .header("X-AUTH-TOKEN",token)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(bytes)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class);
+    }
+
     public Mono<byte[]> getSecondFile(File file) throws IOException {
 
         byte[] bytes = Files.readAllBytes(file.toPath());
@@ -228,7 +262,7 @@ public class AnalyzeService {
         return webClient
                 .post()
                 .uri(DL_SERVER_URL2)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
                 .bodyToMono(byte[].class);
@@ -242,13 +276,14 @@ public class AnalyzeService {
                 .post()
                 .uri(DL_SERVER_URL2)
                 .header("X-AUTH-TOKEN",token)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(bytes)
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
                 .bodyToMono(byte[].class);
     }
 
-    public Tuple2<byte[], byte[]> fetchVideos(File firstFile, File secondFile) throws IOException {
-        return Mono.zip(getFirstFile(firstFile), getSecondFile(secondFile)).block();
+    public Tuple2<byte[], byte[]> fetchVideos(File firstFile, File secondFile,String token) throws IOException {
+        return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token)).block();
     }
 }
