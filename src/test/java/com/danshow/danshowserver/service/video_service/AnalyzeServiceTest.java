@@ -6,6 +6,7 @@ import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.user.Role;
 import com.danshow.danshowserver.web.dto.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.annotation.SecurityTestExecutionListeners;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +34,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest()
+@Slf4j
 class AnalyzeServiceTest {
 
     @Autowired
@@ -42,6 +49,15 @@ class AnalyzeServiceTest {
 
     @Autowired
     private TokenProvider tokenProvider;
+
+    ExchangeStrategies exchangeStrategies =
+            ExchangeStrategies.builder()
+                    .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
+                    .build();// to unlimited memory size .build();
+
+    WebClient webClient = WebClient.builder()
+            .exchangeStrategies(exchangeStrategies)
+            .build();
 
     @Test
     public void testSplitingVideo() throws IOException {
@@ -154,9 +170,10 @@ class AnalyzeServiceTest {
 
         String token = tokenProvider.createToken(member.getEmail(), Role.MEMBER.getKey());
 
-
         final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
         Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
+
+        final String EXAMPLE = "http://1e6c9fcd9326.ngrok.io/one";
 
     }
 

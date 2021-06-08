@@ -32,5 +32,4 @@ public class MemberTestVideoPost extends VideoPost{
 
     private Long score;
 
-
 }

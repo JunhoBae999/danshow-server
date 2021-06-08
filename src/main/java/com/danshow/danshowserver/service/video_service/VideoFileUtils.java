@@ -253,9 +253,7 @@ public class VideoFileUtils {
         if(pData == null){
             return;
         }
-
         int lByteArraySize = pData.length;
-
         try{
             File lOutFile = new File(filename);
             FileOutputStream lFileOutputStream = new FileOutputStream(lOutFile);
@@ -265,7 +263,4 @@ public class VideoFileUtils {
             e.printStackTrace(System.out);
         }
     }
-
-
-
 }

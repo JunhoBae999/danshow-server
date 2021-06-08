@@ -83,8 +83,4 @@ public class UserController {
         }
         return new ResponseEntity<>("Sign up success",HttpStatus.OK);
     }
-
-
-
-
 }

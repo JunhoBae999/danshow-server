@@ -42,8 +42,9 @@ public class VideoController {
     @ApiOperation(value = "Upload Video Post",notes = "Request with Video file, Video post request object, User, Thumbnail image to create post")
     @PostMapping("/api/v1/file")
     public ResponseEntity<String> fileUpload(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
-                                     @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post")VideoPostSaveDto videoPostSaveDto,
+                                     @ApiParam(value = "비디오 포스트 요청 json",required = true) @RequestPart("post") VideoPostSaveDto videoPostSaveDto,
                                      @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt)  {
+
         String email = tokenProvider.getUserPk(Jwt);
 
         try {
@@ -116,18 +117,17 @@ public class VideoController {
     public ResponseEntity<Void> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
                                                           @ApiParam(value = "유저 테스트 비디오") @RequestPart MultipartFile userTestVideo,
                                                           @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
-
         /*
       전달받은 유저의 비디오를 분석하여 전달
        */
-
         analyzeService.getAnalyzedVideo(userTestVideo,id,Jwt);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation(value = "테스트용 미러링 엔드포인트", notes = "요청받은 데이터를 그대로 돌려줍니다.")
     @PostMapping("/mirror")
-    public byte[] getMirror(@RequestBody byte[] videos){
+    public byte[] getMirror(@RequestBody byte[] videos) throws InterruptedException {
+        Thread.sleep(30000);
         return videos;
     }
 
@@ -135,8 +135,8 @@ public class VideoController {
     @GetMapping("api/v1/videos/test")
     public ResponseEntity<List<MemberTestVideoResponseDto>> getMemberTestVideoList(
             @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
+
         String email = tokenProvider.getUserPk(Jwt);
         return new ResponseEntity<>(videoService.getMemberTestVideoList(email),HttpStatus.OK);
     }
-
 }

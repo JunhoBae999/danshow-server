@@ -8,13 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,9 +26,14 @@ import java.util.List;
 @Slf4j
 public class AnalyzeService {
 
-    private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
+    //private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
+    private static final String DL_SERVER_URL1 = "http://27a19ea87411.ngrok.io/one";
 
-    private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
+    //private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
+    private static final String DL_SERVER_URL2 = "http://279a77c28a2a.ngrok.io/one";
+
+    private static final String DL_SERVER_URL3 = "http://1a75fabca39a.ngrok.io/one";
+    //private static final String DL_SERVER_URL3 = "http://localhost:8080/mirror";
 
     private final VideoServiceInterface videoServiceInterface;
 
@@ -79,30 +84,35 @@ public class AnalyzeService {
                 videoFileUtils.splitFile(savedIntegratedFile.getAbsolutePath(),
                         savedIntegratedFile.getName(),
                         localSavePath,
-                        2);
+                        3);
 
         //3-1. A,B를 DL_SERVER_URL1으로 비동기로 보낸다. (분석이 된 영상을 응답받는다.)
         File firstFils = new File(fileList.get(0));
         File secondFile = new File(fileList.get(1));
+        File thirdFile = new File(fileList.get(2));
 
         String firstFilePath = localSavePath+"/01_"+memberTestVideo.getOriginalFilename();
         String secondFilePath = localSavePath+"/02_"+memberTestVideo.getOriginalFilename();
+        String thirdFilePath = localSavePath +"/03_" + memberTestVideo.getOriginalFilename();
 
         String originalFileNameWithoutExtension =
                 memberTestVideo.getOriginalFilename().substring(0,memberTestVideo.getOriginalFilename().indexOf("."));
 
-        Tuple2<byte[], byte[]> fetchVideos = fetchVideos(Files.readAllBytes(firstFils.toPath()),
-                Files.readAllBytes(secondFile.toPath()), token);
+        Tuple3<byte[], byte[], byte[]> fetchVideos = fetchVideos(Files.readAllBytes(firstFils.toPath()),
+                Files.readAllBytes(secondFile.toPath()), Files.readAllBytes(thirdFile.toPath()), token);
 
         videoFileUtils.writeToFile(firstFilePath, fetchVideos.getT1());
         videoFileUtils.writeToFile(secondFilePath, fetchVideos.getT2());
+        videoFileUtils.writeToFile(thirdFilePath, fetchVideos.getT3());
 
         //4. 3단계가 모두 완료가 된다면, 비디오 파일을 다시 순서에 맞게 합친다.
         videoFileUtils.createTxt(firstFilePath,localSavePath,originalFileNameWithoutExtension);
         videoFileUtils.createTxt(secondFilePath,localSavePath,originalFileNameWithoutExtension);
+        videoFileUtils.createTxt(thirdFilePath,localSavePath,originalFileNameWithoutExtension);
 
         firstFils.delete();
         secondFile.delete();
+        thirdFile.delete();
 
         File analyzedFile = new File(videoFileUtils.integrateFiles(localSavePath,originalFileNameWithoutExtension));
 
@@ -264,7 +274,6 @@ public class AnalyzeService {
 
     public Mono<byte[]> getSecondFile(byte[] bytes, String token) throws IOException {
 
-
         return webClient
                 .post()
                 .uri(DL_SERVER_URL2)
@@ -281,8 +290,26 @@ public class AnalyzeService {
                 });
     }
 
-    public Tuple2<byte[], byte[]> fetchVideos(byte[] firstFile, byte[] secondFile, String token) throws IOException {
-        return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token))
+    public Mono<byte[]> getThirdFile(byte[] bytes, String token) throws IOException {
+
+        return webClient
+                .post()
+                .uri(DL_SERVER_URL3)
+                .header("X-AUTH-TOKEN",token)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(bytes)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel())
+                .map(x -> {
+                    log.info("async method call : getThird method called");
+                    return x;
+                });
+    }
+
+    public Tuple3<byte[], byte[], byte[]> fetchVideos(byte[] firstFile, byte[] secondFile, byte[] thirdFile, String token) throws IOException {
+        return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token),getThirdFile(thirdFile,token))
                 .block();
     }
 }
