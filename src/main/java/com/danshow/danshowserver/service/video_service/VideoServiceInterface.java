@@ -1,6 +1,7 @@
 package com.danshow.danshowserver.service.video_service;
 
 import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.domain.video.post.PostType;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.danshow.danshowserver.web.dto.video.MemberTestVideoResponseDto;
@@ -16,7 +17,8 @@ import java.util.List;
 
 public interface VideoServiceInterface {
 
-    public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception;
+    public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto,
+                     String userId) throws Exception;
 
     public VideoMainResponseDto mainPage();
 

@@ -7,8 +7,7 @@ import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.FileRepository;
-import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
-import com.danshow.danshowserver.domain.video.post.VideoPost;
+import com.danshow.danshowserver.domain.video.post.*;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.web.dto.Thumbnail;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
@@ -50,44 +49,41 @@ public class VideoServiceRelease implements VideoServiceInterface{
     private final VideoFileUtils videoFileUtils;
 
     //단순 영상 저장용. 예를들어 분석이 필요없는 단순 강의영상.
-    public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto, String userId) throws Exception {
+    public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto,
+                     String email) throws Exception {
 
-        User dancer = userRepository.findByEmail(userId);
+        User user = userRepository.findByEmail(email);
+        //우선 비디오 포스트로 만듬
+        VideoPost videoPost = makeVideoPost(video,videoPostSaveDto,user);
+        //비디오 타입
+        PostType postType = videoPostSaveDto.getPostType();
         
-        //uuid 붙인 파일명 생성
-        UUID uuid = UUID.randomUUID();
-        String uuidFileName = uuid+"-"+video.getOriginalFilename();
-        //비디오 업로드
-        AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
+        if(postType.equals(PostType.COVER)) { //커버 영상
 
-        String originalFileName = video.getOriginalFilename();
-        String outputPath = System.getProperty("user.dir") + "/files";
-        String inputPath = outputPath + "/" +uuidFileName;
+            //아직 딱히 추가적으로 저장하는 정보는 없음.
+            CoverVideoPost coverVideoPost = new CoverVideoPost(videoPost);
+            videoPostRepository.save(coverVideoPost);
+            return coverVideoPost.getId();
 
-        //임시저장
-        File fileJoinPath = new File(outputPath);
-        if (!fileJoinPath.exists()) {
-            fileJoinPath.mkdirs();
-        }
-        
-        video.transferTo(new File(inputPath));
+        } else if(postType.equals(PostType.TEST)) { //멤버 테스트 영상
 
-        //음악 업로드
-        String audioPath = uploadAudio(inputPath, uuidFileName,outputPath);
-        //썸네일 업로드
-        AttachFile uploadImage = uploadThumbnail(inputPath, uuidFileName,outputPath,originalFileName);
+            //테스트 비디오는 스코어를 저장
+            Long score = videoPostSaveDto.getScore();
+            //VideoPost -> MemberTestVideoPost
+            MemberTestVideoPost memberTestVideoPost = new MemberTestVideoPost(videoPost,score);
+            //저장 후 id 리턴
+            videoPostRepository.save(memberTestVideoPost);
+            return memberTestVideoPost.getId();
 
+        } else if(postType.equals(PostType.LECTURE)) { //강의 영상
 
-        //업로드 후 임시파일 삭제
-        File deleteFile = new File(inputPath);
-
-        if(deleteFile.exists()) {
-            deleteFile.delete();
+            //아직 딱히 추가적으로 저장하는 정보는 없음.
+            LectureVideoPost lectureVideoPost = new LectureVideoPost(videoPost);
+            videoPostRepository.save(lectureVideoPost);
+            return lectureVideoPost.getId();
         }
 
-        VideoPost videoPost = VideoPost.createVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage, audioPath);
-        videoPostRepository.save(videoPost);
-        return videoPost.getId();
+        return -1L;
     }
 
 
@@ -298,5 +294,41 @@ public class VideoServiceRelease implements VideoServiceInterface{
             long rangeLength = Long.min(chunkSize,contentLength);
             return new ResourceRegion(video,0,rangeLength);
         }
+    }
+
+    private VideoPost makeVideoPost(MultipartFile video, VideoPostSaveDto videoPostSaveDto,
+                                    User user) throws IOException {
+        //uuid 붙인 파일명 생성
+        UUID uuid = UUID.randomUUID();
+        String uuidFileName = uuid+"-"+video.getOriginalFilename();
+        //비디오 업로드
+        AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
+
+        String originalFileName = video.getOriginalFilename();
+        String outputPath = System.getProperty("user.dir") + "/files";
+        String inputPath = outputPath + "/" +uuidFileName;
+
+        //임시저장
+        File fileJoinPath = new File(outputPath);
+        if (!fileJoinPath.exists()) {
+            fileJoinPath.mkdirs();
+        }
+
+        video.transferTo(new File(inputPath));
+
+        //음악 업로드
+        String audioPath = uploadAudio(inputPath, uuidFileName,outputPath);
+        //썸네일 업로드
+        AttachFile uploadImage = uploadThumbnail(inputPath, uuidFileName,outputPath,originalFileName);
+
+
+        //업로드 후 임시파일 삭제
+        File deleteFile = new File(inputPath);
+
+        if(deleteFile.exists()) {
+            deleteFile.delete();
+        }
+
+        return VideoPost.createVideoPost(videoPostSaveDto, user, uploadedVideo,  uploadImage, audioPath);
     }
 }

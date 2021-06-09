@@ -17,4 +17,8 @@ import javax.persistence.Table;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class LectureVideoPost extends VideoPost{
+
+    public LectureVideoPost(VideoPost videoPost) {
+        super(videoPost);
+    }
 }
