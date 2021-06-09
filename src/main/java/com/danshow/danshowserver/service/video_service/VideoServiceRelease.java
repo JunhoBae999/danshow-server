@@ -1,10 +1,7 @@
 package com.danshow.danshowserver.service.video_service;
 
 import com.danshow.danshowserver.aspect.TimeCheck;
-import com.danshow.danshowserver.domain.user.Member;
-import com.danshow.danshowserver.domain.user.MemberRepository;
-import com.danshow.danshowserver.domain.user.User;
-import com.danshow.danshowserver.domain.user.UserRepository;
+import com.danshow.danshowserver.domain.user.*;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.domain.video.FileRepository;
 import com.danshow.danshowserver.domain.video.post.*;
@@ -52,38 +49,12 @@ public class VideoServiceRelease implements VideoServiceInterface{
     public Long save(MultipartFile video, VideoPostSaveDto videoPostSaveDto,
                      String email) throws Exception {
 
-        User user = userRepository.findByEmail(email);
         //우선 비디오 포스트로 만듬
-        VideoPost videoPost = makeVideoPost(video,videoPostSaveDto,user);
-        //비디오 타입
-        PostType postType = videoPostSaveDto.getPostType();
+        VideoPost videoPost = makeVideoPost(video,videoPostSaveDto,email);
+        videoPostRepository.save(videoPost);
         
-        if(postType.equals(PostType.COVER)) { //커버 영상
-
-            //아직 딱히 추가적으로 저장하는 정보는 없음.
-            CoverVideoPost coverVideoPost = new CoverVideoPost(videoPost);
-            videoPostRepository.save(coverVideoPost);
-            return coverVideoPost.getId();
-
-        } else if(postType.equals(PostType.TEST)) { //멤버 테스트 영상
-
-            //테스트 비디오는 스코어를 저장
-            Long score = videoPostSaveDto.getScore();
-            //VideoPost -> MemberTestVideoPost
-            MemberTestVideoPost memberTestVideoPost = new MemberTestVideoPost(videoPost,score);
-            //저장 후 id 리턴
-            videoPostRepository.save(memberTestVideoPost);
-            return memberTestVideoPost.getId();
-
-        } else if(postType.equals(PostType.LECTURE)) { //강의 영상
-
-            //아직 딱히 추가적으로 저장하는 정보는 없음.
-            LectureVideoPost lectureVideoPost = new LectureVideoPost(videoPost);
-            videoPostRepository.save(lectureVideoPost);
-            return lectureVideoPost.getId();
-        }
-
-        return -1L;
+        //비디오 포스트 아이디 저장
+        return videoPost.getId();
     }
 
 
@@ -257,7 +228,8 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     public List<MemberTestVideoResponseDto> getMemberTestVideoList(String email) {
         Member member = memberRepository.findByEmail(email);
-        List<MemberTestVideoPost> memberTestVideoList = member.getMemberTestVideoList();
+        List<MemberTestVideoPost> memberTestVideoList = member.getMemberTestVideoPostList();
+        log.info("test size: {}",memberTestVideoList.size());
         //각 MemberTestVideoPost를 Dto로 변환해서 리스트를 반환
         return memberTestVideoList.stream().map(s -> memberTestVideoPostToDto(s)).collect(Collectors.toList());
     }
@@ -297,7 +269,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
     }
 
     private VideoPost makeVideoPost(MultipartFile video, VideoPostSaveDto videoPostSaveDto,
-                                    User user) throws IOException {
+                                    String email) throws IOException {
         //uuid 붙인 파일명 생성
         UUID uuid = UUID.randomUUID();
         String uuidFileName = uuid+"-"+video.getOriginalFilename();
@@ -329,6 +301,38 @@ public class VideoServiceRelease implements VideoServiceInterface{
             deleteFile.delete();
         }
 
-        return VideoPost.createVideoPost(videoPostSaveDto, user, uploadedVideo,  uploadImage, audioPath);
+
+        PostType postType = videoPostSaveDto.getPostType();
+
+        if(postType.equals(PostType.COVER)) { //커버 영상
+
+            Dancer dancer = (Dancer) userRepository.findByEmail(email);
+
+            CoverVideoPost coverVideoPost =
+                    new CoverVideoPost(videoPostSaveDto, dancer, uploadedVideo,  uploadImage, audioPath);
+            videoPostRepository.save(coverVideoPost);
+            return coverVideoPost;
+
+
+        } else if(postType.equals(PostType.TEST)) { //멤버 테스트 영상
+
+            Member member = (Member) userRepository.findByEmail(email);
+
+            //VideoPost -> MemberTestVideoPost
+            MemberTestVideoPost memberTestVideoPost =
+                    new MemberTestVideoPost(videoPostSaveDto, member, uploadedVideo,  uploadImage, audioPath);
+            return memberTestVideoPost;
+
+        } else if(postType.equals(PostType.LECTURE)) { //강의 영상
+
+            Dancer dancer = (Dancer) userRepository.findByEmail(email);
+
+            LectureVideoPost lectureVideoPost =
+                    new LectureVideoPost(videoPostSaveDto, dancer, uploadedVideo, uploadImage, audioPath);
+            videoPostRepository.save(lectureVideoPost);
+            return  lectureVideoPost;
+        }
+
+        return null;
     }
 }

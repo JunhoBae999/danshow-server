@@ -21,10 +21,6 @@ public class VideoPost {
     @Column(name="video_post_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="video_id")
     private AttachFile video;
@@ -71,7 +67,7 @@ public class VideoPost {
 
         videoPost.description = videoPostSaveDto.getDescription();
         videoPost.title = videoPostSaveDto.getTitle();
-        videoPost.user = user;
+
         videoPost.gender = videoPostSaveDto.getGender();
         videoPost.genre = videoPostSaveDto.getGenre();
         videoPost.length = videoPostSaveDto.getLength();
@@ -89,22 +85,19 @@ public class VideoPost {
 
     }
 
-    public VideoPost(VideoPost videoPost) {
-        this.user = videoPost.getUser();
-        this.description = videoPost.getDescription();
-        this.image = videoPost.getImage();
-        this.click = videoPost.getClick();
-        this.difficulty = videoPost.getDifficulty();
-        this.gender = videoPost.getGender();
-        this.genre = videoPost.getGenre();
-        this.length = videoPost.getLength();
-        this.musicPath = videoPost.getMusicPath();
-        this.title = videoPost.getTitle();
-        this.songName = videoPost.getSongName();
-        this.video = videoPost.getVideo();
-    }
+    protected void setData(VideoPostSaveDto videoPostSaveDto, AttachFile uploadedVideo,
+                           AttachFile uploadImage, String musicPath) {
+        this.description = videoPostSaveDto.getDescription();
+        this.title = videoPostSaveDto.getTitle();
+        this.gender = videoPostSaveDto.getGender();
+        this.genre = videoPostSaveDto.getGenre();
 
-    public void setUser(User user) {
-        this.user = user;
+        this.length = videoPostSaveDto.getLength();
+        this.difficulty = videoPostSaveDto.getDifficulty();
+        this.video = uploadedVideo;
+        this.musicPath = musicPath;
+
+        this.image = uploadImage;
+        this.songName = uploadedVideo.getOriginalFileName();
     }
 }

@@ -2,6 +2,8 @@ package com.danshow.danshowserver.domain.video.post;
 
 import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.User;
+import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +19,25 @@ import javax.persistence.*;
 @SuperBuilder
 public class MemberTestVideoPost extends VideoPost{
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Member member;
+
     private Long score;
 
-    public MemberTestVideoPost(VideoPost videoPost, Long score) {
-        super(videoPost);
-        this.score = score;
+    public MemberTestVideoPost(VideoPostSaveDto videoPostSaveDto, Member member,
+                               AttachFile uploadedVideo, AttachFile uploadImage, String audioPath) {
+
+        super.setData(videoPostSaveDto, uploadedVideo,  uploadImage, audioPath);
+        setUser(member);
+        this.score = videoPostSaveDto.getScore();
+
+    }
+
+    public void setUser(Member member) {
+        this.member = member;
+        if(!member.getMemberTestVideoPostList().contains(this)) {
+            member.getMemberTestVideoPostList().add(this);
+        }
     }
 }
