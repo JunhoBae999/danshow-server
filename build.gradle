@@ -27,6 +27,7 @@ dependencies {
     implementation 'junit:junit:4.12'
     implementation 'net.bramp.ffmpeg:ffmpeg:0.6.2'
     implementation 'org.projectlombok:lombok:1.18.16'
+    implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos'
     compile group: 'net.bramp.ffmpeg', name: 'ffmpeg', version: '0.6.2'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
@@ -42,7 +43,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.1.RELEASE'
-    implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.65.Final'
+
 
 }
 

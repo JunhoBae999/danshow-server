@@ -165,8 +165,13 @@ public class VideoServiceRelease implements VideoServiceInterface{
         log.info("uploadMemberTestVideo: member-test video originalFileName : " + memberVideo.getOriginalFilename());
         log.info("uploadMemberTestVideo : member-test video created at : "+memberVideoPath);
 
+        String originalFileNameWithoutExtension = memberVideo.getOriginalFilename().substring(0,memberVideo.getOriginalFilename().indexOf("."));
+
         //1. 유저 비디오를 로컬에 저장한다.
         memberVideo.transferTo(new File(memberVideoPath));
+        String s = videoFileUtils.resizeFile(localPath + "/", originalFileNameWithoutExtension);
+
+        memberVideoPath = s;
 
         //2. 댄서 비디오를 가져와서 저장한다.
         AttachFile dancerVideo = fileRepository.findById(id).orElseThrow(() -> new NoSuchElementException("no video"));

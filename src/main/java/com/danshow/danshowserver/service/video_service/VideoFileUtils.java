@@ -124,8 +124,8 @@ public class VideoFileUtils {
 
     public String resizeFile(String inputPath, String originalFileName) throws IOException {
 
-        String realInputPath = inputPath + originalFileName+".m4";
-        log.info("input path :"+inputPath);
+        String realInputPath = inputPath + originalFileName+".mp4";
+        log.info("input path :"+realInputPath);
 
         String outputPath = inputPath  + originalFileName + "_resized.mp4";
         log.info("outputPath : " + outputPath);
@@ -133,8 +133,8 @@ public class VideoFileUtils {
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
                 .addInput(realInputPath)
-                .addExtraArgs("-s","854*480")
                 .addOutput(outputPath)
+                .addExtraArgs("-s", "1920*1080")
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
@@ -144,8 +144,6 @@ public class VideoFileUtils {
 
         return outputPath;
     }
-
-
 
 
     //로컬에 있는 파일로부터 썸네일 생성

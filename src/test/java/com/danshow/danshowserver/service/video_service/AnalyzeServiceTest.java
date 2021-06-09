@@ -80,8 +80,8 @@ class AnalyzeServiceTest {
     @Test
     public void testIntegrateFile() throws IOException {
 
-        File fileA = new File((System.getProperty("user.dir") + "/files/woman/01_woman.mp4"));
-        File fileB = new File((System.getProperty("user.dir") + "/files/woman/02_woman.mp4"));
+        File fileA = new File((System.getProperty("user.dir") + "/files/dancer.mp4"));
+        File fileB = new File((System.getProperty("user.dir") + "/files/test.mp4"));
 
         Response firstResource = new Response(1, fileA);
         Response secondResource = new Response(2, fileB);
@@ -137,9 +137,17 @@ class AnalyzeServiceTest {
     @Test
     public void testIntegrateSideBySide() throws  Exception {
         final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
-        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
+        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/real_test.mp4");
+
+        String inpuPath = System.getProperty("user.dir")+"/src/main/resources/demofile/";
+        String originalFileName = "real_test";
+
+        String filePath = videoFileUtils.resizeFile(inpuPath,originalFileName);
+
+        Resource realVideo2 = defaultResourceLoader.getResource("classpath:demofile/dancer.mp4");
+
         String outputPath = System.getProperty("user.dir") + "/files/side_by_side_test.mp4";
-        videoFileUtils.integrateFileSideBySide(realVideo.getFile().getAbsolutePath(), realVideo.getFile().getAbsolutePath(),outputPath);
+        videoFileUtils.integrateFileSideBySide(filePath, realVideo2.getFile().getAbsolutePath(),outputPath);
     }
 
     @Test
