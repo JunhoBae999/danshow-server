@@ -9,6 +9,7 @@ import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.danshow.danshowserver.web.dto.video.MemberTestVideoResponseDto;
 import com.danshow.danshowserver.web.dto.video.VideoMainResponseDto;
+import com.danshow.danshowserver.web.uploader.S3Uploader;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,8 +20,10 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Enumeration;
 import java.util.List;
 
 @Api(tags = {"2.Video"})
@@ -31,6 +34,7 @@ public class VideoController {
     private final VideoServiceInterface videoService;
     private final TokenProvider tokenProvider;
     private final AnalyzeService analyzeService;
+    private final S3Uploader s3Uploader;
 
     /**
      * 댄서가 비디오를 업로드 하는 경우입니다. 업로드 할 시 그대로 저장되며, 음원 파일이 추출됩니다.
@@ -72,17 +76,13 @@ public class VideoController {
 
     @ApiOperation(value = "Video Streaming", notes = "Stream the Video with Big size as bytes array.")
     @GetMapping("/api/v1/videos/{id}")
-    public ResponseEntity<ResourceRegion> getVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @RequestHeader HttpHeaders headers) throws IOException {
+    public ResponseEntity<String> getVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @RequestHeader HttpHeaders headers) throws IOException {
 
         AttachFile video = videoService.getVideo(id);
+        byte[] bytes = s3Uploader.getObject(video);
 
-        UrlResource responseVideo = new UrlResource(video.getFilePath());
-
-        ResourceRegion region = videoService.resourceRegion(responseVideo,headers);
-
-        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                .contentType(MediaTypeFactory.getMediaType(responseVideo).orElse(MediaType.APPLICATION_OCTET_STREAM))
-                .body(region);
+        //TODO : S3 URL만 주면 되나?
+        return ResponseEntity.status(HttpStatus.OK).body(video.getFilePath());
     }
 
     @ApiOperation(value = "메인화면 비디오 썸네일", notes = "메인화면의 비디오 썸네일을 제공합니다.")
@@ -94,9 +94,12 @@ public class VideoController {
 
     @ApiOperation(value = "Video Streaming Totally" , notes = "Stream the Video with small size as array")
     @GetMapping("/api/v1/videos/{id}/full")
-    public ResponseEntity<UrlResource> getFullVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id) throws MalformedURLException {
+    public ResponseEntity<UrlResource> getFullVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
+    HttpServletRequest request) throws MalformedURLException {
 
         AttachFile video = videoService.getVideo(id);
+
+
 
         UrlResource resVideo = new UrlResource(video.getFilePath());
 

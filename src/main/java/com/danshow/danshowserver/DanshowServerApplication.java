@@ -25,7 +25,7 @@ public class DanshowServerApplication {
     }
 
     @Bean
-    public AsyncRestTemplate asyncRestTemplate() {
+    public AsyncRestTemplate asyncRㅍㅑㅇㅇㄷestTemplate() {
         return new AsyncRestTemplate();
     }
 

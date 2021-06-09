@@ -312,4 +312,5 @@ public class AnalyzeService {
         return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token),getThirdFile(thirdFile,token))
                 .block();
     }
+
 }
