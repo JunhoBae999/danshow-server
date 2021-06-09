@@ -1,6 +1,7 @@
 package com.danshow.danshowserver.domain.video.post;
 
 import com.danshow.danshowserver.domain.comment.Comment;
+import com.danshow.danshowserver.domain.user.Dancer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,13 @@ public class CoverVideoPost extends VideoPost{
 
     public CoverVideoPost(VideoPost videoPost) {
         super(videoPost);
+    }
+
+    public void setUser(Dancer dancer) {
+        this.setUser(dancer);
+        if(!dancer.getCoverVideoList().contains(this)) {
+            dancer.getCoverVideoList().add(this);
+        }
     }
 
 }

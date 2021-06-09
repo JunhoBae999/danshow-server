@@ -257,7 +257,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
 
     public List<MemberTestVideoResponseDto> getMemberTestVideoList(String email) {
         Member member = memberRepository.findByEmail(email);
-        List<MemberTestVideoPost> memberTestVideoList = member.getMemberTestVideoList();
+        List<MemberTestVideoPost> memberTestVideoList = member.getMemberTestVideoPostList();
         //각 MemberTestVideoPost를 Dto로 변환해서 리스트를 반환
         return memberTestVideoList.stream().map(s -> memberTestVideoPostToDto(s)).collect(Collectors.toList());
     }

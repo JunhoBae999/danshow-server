@@ -103,8 +103,4 @@ public class VideoPost {
         this.songName = videoPost.getSongName();
         this.video = videoPost.getVideo();
     }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

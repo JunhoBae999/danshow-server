@@ -1,6 +1,9 @@
 package com.danshow.danshowserver.domain.user;
 
 import com.danshow.danshowserver.domain.crew.Crew;
+import com.danshow.danshowserver.domain.video.post.CoverVideoPost;
+import com.danshow.danshowserver.domain.video.post.LectureVideoPost;
+import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import lombok.*;
 
@@ -21,20 +24,32 @@ public class Dancer extends User {
     private String dancer_description;
     private String dancer_picture;
 
-    @OneToMany(mappedBy = "user")
-    private List<VideoPost> videoList = new ArrayList<VideoPost>();
+    @OneToOne(mappedBy = "dancer")
+    private Crew crew;
 
-    public void addVideoPost (VideoPost videoPost) {
-        this.videoList.add(videoPost);
+    @OneToMany(mappedBy = "user")
+    private List<LectureVideoPost> lectureVideoList = new ArrayList<LectureVideoPost>();
+
+    public void addLecturVideoPost (LectureVideoPost videoPost) {
+        this.lectureVideoList.add(videoPost);
         //무한루프 방지
         if(videoPost.getUser() != this) {
-            //TODO : 테스트 필
             videoPost.setUser(this);
         }
     }
 
-    @OneToOne(mappedBy = "dancer")
-    private Crew crew;
+    @OneToMany(mappedBy = "user")
+    private List<CoverVideoPost> coverVideoList = new ArrayList<CoverVideoPost>();
+
+    public void addCoverVideoPost (CoverVideoPost videoPost) {
+        this.coverVideoList.add(videoPost);
+        //무한루프 방지
+        if(videoPost.getUser() != this) {
+            videoPost.setUser(this);
+        }
+    }
+
+
 
     @Builder
     public Dancer(String email, String nickname, String name, Role role, String password, String salt,

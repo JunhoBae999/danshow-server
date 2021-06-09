@@ -23,4 +23,11 @@ public class MemberTestVideoPost extends VideoPost{
         super(videoPost);
         this.score = score;
     }
+
+    public void setUser(Member member) {
+        this.setUser(member);
+        if(!member.getMemberTestVideoPostList().contains(this)) {
+            member.getMemberTestVideoPostList().add(this);
+        }
+    }
 }
