@@ -138,4 +138,5 @@ public class VideoController {
         String email = tokenProvider.getUserPk(Jwt);
         return new ResponseEntity<>(videoService.getMemberTestVideoList(email),HttpStatus.OK);
     }
+
 }

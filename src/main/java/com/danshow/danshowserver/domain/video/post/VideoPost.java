@@ -89,6 +89,21 @@ public class VideoPost {
 
     }
 
+    public VideoPost(VideoPost videoPost) {
+        this.user = videoPost.getUser();
+        this.description = videoPost.getDescription();
+        this.image = videoPost.getImage();
+        this.click = videoPost.getClick();
+        this.difficulty = videoPost.getDifficulty();
+        this.gender = videoPost.getGender();
+        this.genre = videoPost.getGenre();
+        this.length = videoPost.getLength();
+        this.musicPath = videoPost.getMusicPath();
+        this.title = videoPost.getTitle();
+        this.songName = videoPost.getSongName();
+        this.video = videoPost.getVideo();
+    }
+
     public void setUser(User user) {
         this.user = user;
     }

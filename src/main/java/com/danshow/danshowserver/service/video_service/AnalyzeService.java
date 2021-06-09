@@ -27,12 +27,12 @@ import java.util.List;
 public class AnalyzeService {
 
     //private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
-    private static final String DL_SERVER_URL1 = "http://27a19ea87411.ngrok.io/one";
+    private static final String DL_SERVER_URL1 = "http://677d4c2dc1f7.ngrok.io/one";
 
     //private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
-    private static final String DL_SERVER_URL2 = "http://279a77c28a2a.ngrok.io/one";
+    private static final String DL_SERVER_URL2 = "http://45e404a3ce2e.ngrok.io/one";
 
-    private static final String DL_SERVER_URL3 = "http://1a75fabca39a.ngrok.io/one";
+    private static final String DL_SERVER_URL3 = "http://a5518f5e4d86.ngrok.io/one";
     //private static final String DL_SERVER_URL3 = "http://localhost:8080/mirror";
 
     private final VideoServiceInterface videoServiceInterface;

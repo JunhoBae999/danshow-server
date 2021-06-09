@@ -17,10 +17,10 @@ import javax.persistence.*;
 @SuperBuilder
 public class MemberTestVideoPost extends VideoPost{
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Member member;
-
     private Long score;
 
+    public MemberTestVideoPost(VideoPost videoPost, Long score) {
+        super(videoPost);
+        this.score = score;
+    }
 }

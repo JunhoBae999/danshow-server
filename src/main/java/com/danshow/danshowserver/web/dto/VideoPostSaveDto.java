@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.web.dto;
 
+import com.danshow.danshowserver.domain.video.post.PostType;
 import lombok.*;
 
 @Getter
@@ -22,5 +23,9 @@ public class VideoPostSaveDto {
     private String gender;
 
     private Long length;
+
+    private Long score;
+
+    private PostType postType;
 
 }

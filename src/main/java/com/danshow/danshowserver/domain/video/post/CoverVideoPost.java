@@ -34,4 +34,8 @@ public class CoverVideoPost extends VideoPost{
         }
     }
 
+    public CoverVideoPost(VideoPost videoPost) {
+        super(videoPost);
+    }
+
 }
