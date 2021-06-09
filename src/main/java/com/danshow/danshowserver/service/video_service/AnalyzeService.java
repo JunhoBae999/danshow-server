@@ -1,6 +1,15 @@
 package com.danshow.danshowserver.service.video_service;
 
 import com.danshow.danshowserver.aspect.TimeCheck;
+import com.danshow.danshowserver.config.auth.TokenProvider;
+import com.danshow.danshowserver.domain.user.Member;
+import com.danshow.danshowserver.domain.user.MemberRepository;
+import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
+import com.danshow.danshowserver.domain.video.post.VideoPost;
+import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
+import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
+import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.danshow.danshowserver.web.dto.response.Response;
 import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +28,7 @@ import reactor.util.function.Tuple3;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -43,6 +53,12 @@ public class AnalyzeService {
 
     private final S3Uploader s3Uploader;
 
+    private final TokenProvider tokenProvider;
+
+    private final MemberRepository memberRepository;
+
+    private final VideoPostRepository videoPostRepository;
+
     ExchangeStrategies exchangeStrategies =
             ExchangeStrategies.builder()
                     .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
@@ -56,13 +72,16 @@ public class AnalyzeService {
             .exchangeStrategies(exchangeStrategies)
             .build();
 
+    /*
     @Autowired
-    public AnalyzeService(ApiService<Response> apiService, VideoServiceInterface videoServiceInterface, VideoFileUtils videoFileUtils, S3Uploader s3Uploader) {
+    public AnalyzeService(ApiService<Response> apiService, VideoServiceInterface videoServiceInterface,
+                          VideoFileUtils videoFileUtils, S3Uploader s3Uploader, ) {
         this.videoServiceInterface = videoServiceInterface;
         this.apiService = apiService;
         this.videoFileUtils = videoFileUtils;
         this.s3Uploader = s3Uploader;
     }
+     */
 
     /**
      *
@@ -119,15 +138,28 @@ public class AnalyzeService {
         log.info("final file before s3 path : " + analyzedFile.getAbsolutePath());
         log.info("final file before s3 filename : " + analyzedFile.getName());
 
-        String video = s3Uploader.upload(analyzedFile.getAbsolutePath()
+        String videoPath = s3Uploader.upload(analyzedFile.getAbsolutePath()
                 ,analyzedFile.getName(),"video");
 
+        AttachFile savedVideo = AttachFile.builder()
+                .filename(originalFileNameWithoutExtension+"_"+new Date())
+                .filePath(videoPath)
+                .originalFileName(originalFileNameWithoutExtension)
+                .build();
 
+        String userPk = tokenProvider.getUserPk(token);
+        Member ownerMember = memberRepository.findByEmail(userPk);
+        VideoPost videoPost = videoPostRepository.findByFileId(id);
 
+        VideoPostSaveDto videoPostSaveDto = VideoPostSaveDto.of(videoPost,ownerMember);
 
-        log.info("video path : " + video);
+        MemberTestVideoPost memberTestVideoPost = new MemberTestVideoPost(videoPostSaveDto,ownerMember,savedVideo,null,null);
+
+        videoPostRepository.save(memberTestVideoPost);
+
+        log.info("video path : " + videoPath);
         //5. 합쳐진 비디오 파일을 돌려준다.
-        return video;
+        return videoPath;
     }
 
     public void splitVideoIntoTwo(List<String> fileList,File originalFile, Integer chunkNumber) throws IOException {

@@ -1,6 +1,8 @@
 package com.danshow.danshowserver.web.dto;
 
+import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.video.post.PostType;
+import com.danshow.danshowserver.domain.video.post.VideoPost;
 import lombok.*;
 
 @Getter
@@ -28,4 +30,18 @@ public class VideoPostSaveDto {
 
     private PostType postType;
 
+    public static VideoPostSaveDto of(VideoPost videoPost, User user) {
+
+        //멤버테스트 비디오와의
+        return VideoPostSaveDto.builder()
+                .title(videoPost.getTitle())
+                .description(videoPost.getDescription())
+                .userId(user.getEmail())
+                .difficulty(videoPost.getDifficulty())
+                .gender(videoPost.getGender())
+                .genre(videoPost.getGenre())
+                .length(videoPost.getLength())
+                .postType(PostType.TEST)
+                .build();
+    }
 }

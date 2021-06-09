@@ -73,18 +73,6 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
-    @ApiOperation(value = "Video Streaming", notes = "Stream the Video with Big size as bytes array.")
-    @GetMapping("/api/v1/videos/{id}")
-    public ResponseEntity<String> getVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id, @RequestHeader HttpHeaders headers) throws IOException {
-
-        AttachFile video = videoService.getVideo(id);
-        byte[] bytes = s3Uploader.getObject(video);
-
-        //TODO : S3 URL만 주면 되나?
-        return ResponseEntity.status(HttpStatus.OK).body(video.getFilePath());
-    }
-
     @ApiOperation(value = "메인화면 비디오 썸네일", notes = "메인화면의 비디오 썸네일을 제공합니다.")
     @GetMapping("/api/v1/videos/main")
     public ResponseEntity<VideoMainResponseDto> videoMain() {
@@ -92,21 +80,6 @@ public class VideoController {
         return new ResponseEntity<>(responseDto,HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Video Streaming Totally" , notes = "Stream the Video with small size as array")
-    @GetMapping("/api/v1/videos/{id}/full")
-    public ResponseEntity<UrlResource> getFullVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
-    HttpServletRequest request) throws MalformedURLException {
-
-        AttachFile video = videoService.getVideo(id);
-
-
-
-        UrlResource resVideo = new UrlResource(video.getFilePath());
-
-        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                .contentType(MediaTypeFactory.getMediaType(resVideo).orElse(MediaType.APPLICATION_OCTET_STREAM))
-                .body(resVideo);
-    }
 
     @ApiOperation(value = "유저 테스트 비디오 선택", notes = "유저가 테스트할 비디오를 선택하는 경우 음원파일을 제공합니다.")
     @GetMapping("/api/v1/videos/{id}/music")
@@ -119,9 +92,7 @@ public class VideoController {
     public ResponseEntity<Void> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
                                                           @ApiParam(value = "유저 테스트 비디오") @RequestPart MultipartFile userTestVideo,
                                                           @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
-        /*
-      전달받은 유저의 비디오를 분석하여 전달
-       */
+
         analyzeService.getAnalyzedVideo(userTestVideo,id,Jwt);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -140,6 +111,6 @@ public class VideoController {
 
         String email = tokenProvider.getUserPk(Jwt);
         return new ResponseEntity<>(videoService.getMemberTestVideoList(email),HttpStatus.OK);
-    }
 
+    }
 }

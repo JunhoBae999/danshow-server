@@ -273,6 +273,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
         //uuid 붙인 파일명 생성
         UUID uuid = UUID.randomUUID();
         String uuidFileName = uuid+"-"+video.getOriginalFilename();
+
         //비디오 업로드
         AttachFile uploadedVideo = uploadFile(video,uuidFileName,"video");
 

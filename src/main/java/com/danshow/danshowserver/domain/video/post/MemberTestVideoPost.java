@@ -31,7 +31,6 @@ public class MemberTestVideoPost extends VideoPost{
         super.setData(videoPostSaveDto, uploadedVideo,  uploadImage, audioPath);
         setUser(member);
         this.score = videoPostSaveDto.getScore();
-
     }
 
     public void setUser(Member member) {
@@ -40,4 +39,5 @@ public class MemberTestVideoPost extends VideoPost{
             member.getMemberTestVideoPostList().add(this);
         }
     }
+
 }

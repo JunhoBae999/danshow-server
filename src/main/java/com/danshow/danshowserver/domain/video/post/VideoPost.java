@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.domain.video.post;
 
+import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.User;
 import com.danshow.danshowserver.domain.video.AttachFile;
 import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
@@ -100,4 +101,5 @@ public class VideoPost {
         this.image = uploadImage;
         this.songName = uploadedVideo.getOriginalFileName();
     }
+
 }

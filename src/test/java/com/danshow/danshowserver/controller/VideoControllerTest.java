@@ -2,6 +2,7 @@ package com.danshow.danshowserver.controller;
 
 import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.user.*;
+import com.danshow.danshowserver.domain.video.post.PostType;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
 import com.danshow.danshowserver.service.video_service.AnalyzeService;
 import com.danshow.danshowserver.service.video_service.ApiService;
@@ -118,7 +119,7 @@ class VideoControllerTest {
                 Files.readAllBytes(realVideo.getFile().toPath()));
 
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test@test.test",
-                1L, "idol", "boy", 1L));
+                1L, "idol", "boy", 1L,300L,PostType.LECTURE));
 
         MockMultipartFile json = new MockMultipartFile("post", "video_post", "application/json", videoPostContent.getBytes(StandardCharsets.UTF_8));
 
@@ -155,7 +156,7 @@ class VideoControllerTest {
                 Files.readAllBytes(realVideo.getFile().toPath()));
 
         String videoPostContent = objectMapper.writeValueAsString(new VideoPostSaveDto("test title", "test description", "test.test1@test.test",
-                1L,"idol","boy",1L));
+                1L,"idol","boy",1L,300L,PostType.LECTURE));
 
         MockMultipartFile json = new MockMultipartFile("post","video_post","application/json",videoPostContent.getBytes(StandardCharsets.UTF_8));
 
