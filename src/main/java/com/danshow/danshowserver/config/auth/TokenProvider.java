@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TokenProvider {
 
     private String secretKey = "danshowsecretkey"; //TODO application-oauth.yml에 새로운 값으로 옮기기
@@ -38,7 +40,7 @@ public class TokenProvider {
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
-                .setIssuedAt(now) // 토큰 발행 시간 정보
+                .setIssuedAt(new Date(now.getTime() - 10000L)) // 토큰 발행 시간 정보 TODO 임시로 10초전으로 세팅
                 .setExpiration(new Date(now.getTime() + tokenValidTime)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 // signature 에 들어갈 secret값 세팅
@@ -65,6 +67,9 @@ public class TokenProvider {
     public boolean validateToken(String jwtToken) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            log.info("valid: {}",!claims.getBody().getExpiration().before(new Date()));
+            log.info("Expiration: {}",claims.getBody().getExpiration());
+            log.info("Now : {}",new Date());
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
