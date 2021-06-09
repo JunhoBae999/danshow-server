@@ -2,6 +2,7 @@ package com.danshow.danshowserver.controller;
 
 import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.domain.video.post.PostType;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.service.video_service.AnalyzeService;
 import com.danshow.danshowserver.service.video_service.VideoServiceInterface;
@@ -110,7 +111,34 @@ public class VideoController {
             @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) {
 
         String email = tokenProvider.getUserPk(Jwt);
-        return new ResponseEntity<>(videoService.getMemberTestVideoList(email),HttpStatus.OK);
+        return new ResponseEntity<>(videoService.getMemberTestVideoList(email), HttpStatus.OK);
+    }
 
+    @ApiOperation(value = "Upload Video Post 임시",notes = "임시 엔드포인트")
+    @PostMapping("/api/v1/fileTemp")
+    public ResponseEntity<String> fileUploadTemp(@ApiParam(value = "비디오 파일",required = true) @RequestPart("video")  MultipartFile video,
+                                             @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt)  {
+
+        VideoPostSaveDto videoPostSaveDto =
+                VideoPostSaveDto.builder()
+                .postType(PostType.TEST)
+                .description("temp")
+                .difficulty(12L)
+                .gender("mail")
+                .genre("k-pop")
+                .length(120L)
+                .score(99L)
+                .title("awesome dance")
+                .userId("lalala").build();
+
+        String email = tokenProvider.getUserPk(Jwt);
+
+        try {
+            Long videoPostId = videoService.save(video,videoPostSaveDto,email);
+            return new ResponseEntity<>(videoPostId.toString(), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("fail", HttpStatus.OK);
     }
 }
