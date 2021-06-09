@@ -27,24 +27,24 @@ public class Dancer extends User {
     @OneToOne(mappedBy = "dancer")
     private Crew crew;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "dancer")
     private List<LectureVideoPost> lectureVideoList = new ArrayList<LectureVideoPost>();
 
     public void addLecturVideoPost (LectureVideoPost videoPost) {
         this.lectureVideoList.add(videoPost);
         //무한루프 방지
-        if(videoPost.getUser() != this) {
+        if(videoPost.getDancer() != this) {
             videoPost.setUser(this);
         }
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "dancer")
     private List<CoverVideoPost> coverVideoList = new ArrayList<CoverVideoPost>();
 
     public void addCoverVideoPost (CoverVideoPost videoPost) {
         this.coverVideoList.add(videoPost);
         //무한루프 방지
-        if(videoPost.getUser() != this) {
+        if(videoPost.getDancer() != this) {
             videoPost.setUser(this);
         }
     }

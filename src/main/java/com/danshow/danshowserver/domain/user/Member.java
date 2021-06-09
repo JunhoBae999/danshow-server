@@ -29,13 +29,13 @@ public class Member extends User {
         this.profile_picture = profile_picture;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "member")
     private List<MemberTestVideoPost> memberTestVideoPostList = new ArrayList<MemberTestVideoPost>();
 
     public void addVideoPost (MemberTestVideoPost videoPost) {
         this.memberTestVideoPostList.add(videoPost);
         //무한루프 방지
-        if(videoPost.getUser() != this) {
+        if(videoPost.getMember() != this) {
             videoPost.setUser(this);
         }
     }
