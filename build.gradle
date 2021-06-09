@@ -43,6 +43,7 @@ dependencies {
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.1.RELEASE'
     implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.65.Final'
+
 }
 
 test {

@@ -122,6 +122,32 @@ public class VideoFileUtils {
 
     }
 
+    public String resizeFile(String inputPath, String originalFileName) throws IOException {
+
+        String realInputPath = inputPath + originalFileName+".m4";
+        log.info("input path :"+inputPath);
+
+        String outputPath = inputPath  + originalFileName + "_resized.mp4";
+        log.info("outputPath : " + outputPath);
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .addInput(realInputPath)
+                .addExtraArgs("-s","854*480")
+                .addOutput(outputPath)
+                .done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
+        executor.createJob(builder).run();
+
+        log.info("final resize phase complete, output path  : " + outputPath);
+
+        return outputPath;
+    }
+
+
+
+
     //로컬에 있는 파일로부터 썸네일 생성
     public String extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
 

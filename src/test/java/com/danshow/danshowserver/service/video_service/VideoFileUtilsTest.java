@@ -47,9 +47,12 @@ class VideoFileUtilsTest {
 
     @Test
     void getMemberTestVideoUploadedToS3() throws  IOException {
-
-
     }
 
-
+    @Test
+    void resizeTest() throws IOException {
+        String inputPath = System.getProperty("user.dir") + "/files/";
+        String originalFileName = "test";
+        String path = videoFileUtils.resizeFile(inputPath,originalFileName);
+    }
 }
