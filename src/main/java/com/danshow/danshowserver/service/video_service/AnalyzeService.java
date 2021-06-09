@@ -119,7 +119,11 @@ public class AnalyzeService {
         log.info("final file before s3 path : " + analyzedFile.getAbsolutePath());
         log.info("final file before s3 filename : " + analyzedFile.getName());
 
-        String video = s3Uploader.upload(analyzedFile.getAbsolutePath(),analyzedFile.getName(),"video");
+        String video = s3Uploader.upload(analyzedFile.getAbsolutePath()
+                ,analyzedFile.getName(),"video");
+
+
+
 
         log.info("video path : " + video);
         //5. 합쳐진 비디오 파일을 돌려준다.
