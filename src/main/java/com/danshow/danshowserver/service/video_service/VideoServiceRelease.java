@@ -128,8 +128,8 @@ public class VideoServiceRelease implements VideoServiceInterface{
     public VideoMainResponseDto mainPage() {
         List<Thumbnail> thumbnailList = new ArrayList<>();
         List<VideoPost> all = videoPostRepository.findAll();
-        for (int i = 0; i < all.size() && i < 6; i++) {
-            // 최대 6개까지만 리스트에 담기d
+        for (int i = all.size()-1; i >= all.size()-6 && i >=0; i--) {
+            // 최대 6개까지만 리스트에 담기
             thumbnailList.add(makeThumbnail(all.get(i)));
         }
         return VideoMainResponseDto.builder()
