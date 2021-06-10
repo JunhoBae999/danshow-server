@@ -228,7 +228,7 @@ public class VideoServiceRelease implements VideoServiceInterface{
             deleteFile.delete();
         }
 
-        return filePath;
+        return fileName;
     }
 
     public List<MemberTestVideoResponseDto> getMemberTestVideoList(String email) {

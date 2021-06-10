@@ -5,6 +5,7 @@ import com.danshow.danshowserver.config.auth.TokenProvider;
 import com.danshow.danshowserver.domain.user.Member;
 import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.domain.video.FileRepository;
 import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
 import com.danshow.danshowserver.domain.video.post.VideoPost;
 import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
@@ -15,6 +16,7 @@ import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,12 +39,12 @@ import java.util.List;
 public class AnalyzeService {
 
     //private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
-    private static final String DL_SERVER_URL1 = "http://c2b88dba7d9d.ngrok.io/one";
+    private static final String DL_SERVER_URL1 = "http://e74dead86193.ngrok.io/one";
 
     //private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
-    private static final String DL_SERVER_URL2 = "http://f543358b4823.ngrok.io/one";
+    private static final String DL_SERVER_URL2 = "http://96198d1f7b07.ngrok.io/one";
 
-    private static final String DL_SERVER_URL3 = "http://2f50ce75a8a2.ngrok.io/one";
+    private static final String DL_SERVER_URL3 = "http://0f09a5c8c4ee.ngrok.io/one";
     //private static final String DL_SERVER_URL3 = "http://localhost:8080/mirror";
 
     private final VideoServiceInterface videoServiceInterface;
@@ -58,6 +60,8 @@ public class AnalyzeService {
     private final MemberRepository memberRepository;
 
     private final VideoPostRepository videoPostRepository;
+
+    private final FileRepository fileRepository;
 
     ExchangeStrategies exchangeStrategies =
             ExchangeStrategies.builder()
@@ -138,7 +142,20 @@ public class AnalyzeService {
         log.info("final file before s3 path : " + analyzedFile.getAbsolutePath());
         log.info("final file before s3 filename : " + analyzedFile.getName());
 
-        String videoPath = s3Uploader.upload(analyzedFile.getAbsolutePath()
+        String userPk = tokenProvider.getUserPk(token);
+        Member ownerMember = memberRepository.findByEmail(userPk);
+        VideoPost videoPost = videoPostRepository.findByFileId(id);
+
+        byte[] obj = s3Uploader.getObject(videoPost.getMusicPath());
+        videoFileUtils.writeToFile(System.getProperty("user.dir")+"/tmp/audio.mp3", obj);
+
+        videoFileUtils.integrateAudio(analyzedFile.getAbsolutePath(),System.getProperty("user.dir")+"/tmp/audio.mp3",
+                System.getProperty("user.dir")+"/tmp/output.mp4");
+
+        File finalFile = new File(System.getProperty("user.dir")+"/tmp/output.mp4");
+
+
+        String videoPath = s3Uploader.upload(finalFile.getAbsolutePath()
                 ,analyzedFile.getName(),"video");
 
         AttachFile savedVideo = AttachFile.builder()
@@ -147,9 +164,6 @@ public class AnalyzeService {
                 .originalFileName(originalFileNameWithoutExtension)
                 .build();
 
-        String userPk = tokenProvider.getUserPk(token);
-        Member ownerMember = memberRepository.findByEmail(userPk);
-        VideoPost videoPost = videoPostRepository.findByFileId(id);
 
         VideoPostSaveDto videoPostSaveDto = VideoPostSaveDto.of(videoPost,ownerMember);
 

@@ -91,6 +91,15 @@ public class S3Uploader {
         return bytes;
     }
 
+    public byte[] getObject(String filePath) throws IOException {
+        //S3Object o = s3Client.getObject(new GetObjectRequest(bucket+"/video",));
+        S3Object o = s3Client.getObject(new GetObjectRequest(bucket+"/audio",filePath));
+        S3ObjectInputStream objectInputStream = o.getObjectContent();
+        byte[] bytes = IOUtils.toByteArray(objectInputStream);
+
+        return bytes;
+    }
+
 
 
 

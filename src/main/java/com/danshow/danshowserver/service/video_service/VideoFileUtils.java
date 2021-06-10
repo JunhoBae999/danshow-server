@@ -61,7 +61,8 @@ public class VideoFileUtils {
         String originalFileNameWithoutExtensionWithUUID = UUID.randomUUID().toString() + "-" + originalFileNameWithoutExtension;
 
         List<String> splitFileList = new ArrayList<String>();
-        int startPoint = 0;
+
+        Double startPoint = 0.0;
 
         createDirectory(outputPath);
 
@@ -144,6 +145,29 @@ public class VideoFileUtils {
 
         return outputPath;
     }
+
+    public String integrateAudio(String videoPath, String audioPath, String outputPath) throws IOException{
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .addInput(videoPath)
+                .addInput(audioPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-map","0:v")
+                .addExtraArgs("-map","1:a")
+                .addExtraArgs("-c:v","copy")
+                .done();
+
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
+        executor.createJob(builder).run();
+
+        log.info("integrated audio completed : " + outputPath);
+
+        return outputPath;
+    }
+
+
 
 
     //로컬에 있는 파일로부터 썸네일 생성

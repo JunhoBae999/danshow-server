@@ -55,4 +55,16 @@ class VideoFileUtilsTest {
         String originalFileName = "test";
         String path = videoFileUtils.resizeFile(inputPath,originalFileName);
     }
+
+    @Test
+    void integrateMp3Test() throws IOException {
+
+        String videotPath = System.getProperty("user.dir") + "/tmp/test.mp4";
+        String audioPath = System.getProperty("user.dir") + "/tmp/taudio.mp3";
+        String outputPath = System.getProperty("user.dir") + "/tmp/test_audio_integrated.mp4";
+
+        videoFileUtils.integrateAudio(videotPath,audioPath,outputPath);
+
+    }
+
 }
