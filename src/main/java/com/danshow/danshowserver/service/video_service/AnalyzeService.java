@@ -39,12 +39,12 @@ import java.util.List;
 public class AnalyzeService {
 
     //private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
-    private static final String DL_SERVER_URL1 = "http://9078b13212fa.ngrok.io/one";
+    private static final String DL_SERVER_URL1 = "http://63f5d84a4001.ngrok.io/one";
 
     //private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
-    private static final String DL_SERVER_URL2 = "http://0ff201f5e76f.ngrok.io/one";
+    private static final String DL_SERVER_URL2 = "http://df71c1d0415d.ngrok.io/one";
 
-    private static final String DL_SERVER_URL3 = "http://fecfe0dd50af.ngrok.io/one";
+    private static final String DL_SERVER_URL3 = "http://b5066984c664.ngrok.io/one";
     //private static final String DL_SERVER_URL3 = "http://localhost:8080/mirror";
 
     private final VideoServiceInterface videoServiceInterface;
@@ -165,10 +165,9 @@ public class AnalyzeService {
                 .originalFileName(originalFileNameWithoutExtension)
                 .build();
 
-
         VideoPostSaveDto videoPostSaveDto = VideoPostSaveDto.of(videoPost,ownerMember);
 
-        MemberTestVideoPost memberTestVideoPost = new MemberTestVideoPost(videoPostSaveDto,ownerMember,savedVideo,null,null);
+        MemberTestVideoPost memberTestVideoPost = new MemberTestVideoPost(videoPostSaveDto,ownerMember,savedVideo,videoPost.getImage(),null);
 
         videoPostRepository.save(memberTestVideoPost);
 
