@@ -31,11 +31,25 @@ class VideoServiceReleaseTest {
                 "video/mp4",
                 Files.readAllBytes(realVideo.getFile().toPath()));
 
-        List<String> splitFileList = videoService.split(video,2);
+        List<String> splitFileList = videoService.splitUpload(video,2);
         assertThat(splitFileList.size()).isEqualTo(2);
         for(String s : splitFileList) {
             System.out.println("s = " + s);
         }
+    }
+
+    @Test
+    public void uploadMemberTestVideoTest() throws Exception {
+
+        final DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+        Resource realVideo = defaultResourceLoader.getResource("classpath:demofile/woman.mp4");
+
+        MockMultipartFile video = new MockMultipartFile("video",
+                "member_test_video.mp4",
+                "video/mp4",
+                Files.readAllBytes(realVideo.getFile().toPath()));
+
+        videoService.uploadMemberTestVideo(video,4L);
     }
 
 }

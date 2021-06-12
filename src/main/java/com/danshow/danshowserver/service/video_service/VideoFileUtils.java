@@ -1,5 +1,6 @@
 package com.danshow.danshowserver.service.video_service;
 
+import com.danshow.danshowserver.aspect.TimeCheck;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -7,11 +8,13 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.modelmapper.internal.util.Assert;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,10 +25,10 @@ import java.util.UUID;
 @Component
 public class VideoFileUtils {
 
-    private String ffmpegPath = "/usr/local/bin/ffmpeg";
-    //private String ffmpegPath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffmpeg";
-    private String ffprobePath = "/usr/local/bin/ffprobe";
-    //private String ffprobePath = "C:/Program Files/ffmpeg-4.4-full_build/bin/ffprobe";
+    @Value("${local.ffmpeg}")
+    private String ffmpegPath;
+    @Value("${local.ffprobe}")
+    private String ffprobePath;
 
     private FFmpeg fFmpeg;
 
@@ -47,6 +50,7 @@ public class VideoFileUtils {
         }
     }
 
+    @TimeCheck
     public List<String> splitFile(String inputPath, String originalFileName, String outputPath , Integer chunkNumber) throws IOException {
         FFmpegProbeResult probeResult = fFprobe.probe(inputPath);
 
@@ -57,20 +61,14 @@ public class VideoFileUtils {
         String originalFileNameWithoutExtensionWithUUID = UUID.randomUUID().toString() + "-" + originalFileNameWithoutExtension;
 
         List<String> splitFileList = new ArrayList<String>();
-        int startPoint = 0;
 
-        File fileJoinPath = new File(outputPath + "/" +originalFileNameWithoutExtension);
+        Double startPoint = 0.0;
 
-        if (!fileJoinPath.exists()) {
-            fileJoinPath.mkdirs();
-            log.info("Created Directory -> "+ fileJoinPath.getAbsolutePath());
-        }
+        createDirectory(outputPath);
 
         for(int i = 1; i<=chunkNumber; i++) {
 
-            log.info("output path : " + fileJoinPath);
-
-            String totalPath = fileJoinPath + "/"+originalFileNameWithoutExtensionWithUUID+"_"+i+".mp4";
+            String totalPath = outputPath + "/"+originalFileNameWithoutExtensionWithUUID+"_"+i+".mp4";
 
             FFmpegBuilder builder = new FFmpegBuilder()
                     .overrideOutputFiles(true)
@@ -89,7 +87,7 @@ public class VideoFileUtils {
 
             log.info("split done");
 
-            createTxt(totalPath, fileJoinPath.getAbsolutePath(), originalFileNameWithoutExtensionWithUUID);
+            //createTxt(totalPath, outputPath, originalFileNameWithoutExtensionWithUUID);
 
             splitFileList.add(totalPath);
             startPoint += streamSize;
@@ -102,28 +100,85 @@ public class VideoFileUtils {
      * @param originalFileName
      * @throws IOException
      */
-    public void integrateFiles(String inputPath,String originalFileName) throws IOException {
+    @TimeCheck
+    public String integrateFiles(String inputPath,String originalFileName) throws IOException {
 
         String fileList = inputPath + "/" + originalFileName+".txt";
+
+        String outputPath = inputPath + "/" + originalFileName + "_final_ver.mp4";
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
                 .addInput(fileList)
                 .addExtraArgs("-f","concat")
                 .addExtraArgs("-safe", "0")
-                .addOutput(inputPath + "/" + originalFileName + "_merged.mp4")
+                .addOutput(outputPath)
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
         executor.createJob(builder).run();
+
+        log.info("final integrate phase complete, output path  : " + outputPath);
+        return outputPath;
+
     }
+
+    public String resizeFile(String inputPath, String originalFileName) throws IOException {
+
+        String realInputPath = inputPath + originalFileName+".mp4";
+        log.info("input path :"+realInputPath);
+
+        String outputPath = inputPath  + originalFileName + "_resized.mp4";
+        log.info("outputPath : " + outputPath);
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .addInput(realInputPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-s", "1920*1080")
+                .done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
+        executor.createJob(builder).run();
+
+        log.info("final resize phase complete, output path  : " + outputPath);
+
+        return outputPath;
+    }
+
+    public String integrateAudio(String videoPath, String audioPath, String outputPath) throws IOException{
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .addInput(videoPath)
+                .addInput(audioPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-map","0:v")
+                .addExtraArgs("-map","1:a")
+                .addExtraArgs("-c:v","copy")
+                .done();
+
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
+        executor.createJob(builder).run();
+
+        log.info("integrated audio completed : " + outputPath);
+
+        return outputPath;
+    }
+
+
+
 
     //로컬에 있는 파일로부터 썸네일 생성
     public String extractThumbnail(String inputPath,String originalFileName, String outputPath) throws IOException {
 
-        String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
-        outputPath = outputPath + "/" +originalFileNameWithoutExtension
-                + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
+        String originalFileNameWithoutExtension =
+                originalFileName.substring(0,originalFileName.lastIndexOf("."));
+        outputPath = outputPath + "/" + originalFileNameWithoutExtension + "_thumbnail.gif";
+
+        log.info("new ouput path : " + outputPath);
+
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
@@ -151,8 +206,15 @@ public class VideoFileUtils {
     //멀티파일과 저장할 파일 이름을 받아서 로컬에 저장하고 썸네일 생성
     public String extractThumbnail(MultipartFile video, String originalFileName) throws IOException {
         String outputPath = System.getProperty("user.dir") + "/files";
-        String inputPath = System.getProperty("user.dir") + "/files/"
-                +originalFileName.substring(0,originalFileName.indexOf("."))+"/"+originalFileName;
+
+        log.info("output-path : "+outputPath);
+
+        createDirectory(outputPath);
+
+        String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
+
+        log.info("input-path : " + inputPath);
+
         video.transferTo(new File(inputPath));
         return extractThumbnail(inputPath, originalFileName, outputPath);
     }
@@ -178,6 +240,81 @@ public class VideoFileUtils {
         File deleteFile = new File(filePath);
         if(deleteFile.exists()) {
             deleteFile.delete();
+        }
+    }
+
+    public String integrateFileSideBySide(String firstVideoPath, String secondVideoPath, String outputPath) {
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .addInput(firstVideoPath)
+                .addInput(secondVideoPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-preset", "ultrafast")
+                .addExtraArgs("-filter_complex", "[0:v]setpts=PTS-STARTPTS, pad=iw*2+5:ih[bg]; [1:v]setpts=PTS-STARTPTS[fg]; [bg][fg]overlay=w+10")
+                .done();
+        
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);
+        executor.createJob(builder).run();
+
+        return outputPath;
+
+    }
+
+    public String extractAudio(String inputPath,String originalFileName, String outputPath) throws IOException {
+        String originalFileNameWithoutExtension = originalFileName.substring(0,originalFileName.indexOf("."));
+        outputPath = outputPath + "/" +originalFileNameWithoutExtension + "_audio.mp3";
+
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .overrideOutputFiles(true)
+                .setInput(inputPath)
+                .addOutput(outputPath)
+                .addExtraArgs("-ab","128k")
+                .addExtraArgs("-vn")                    //비디오 추출 안함
+                //.addExtraArgs("-acodec","libmp3lame")   //오디오 코덱 지정, mp3
+                .addExtraArgs("-ar","44.1k")            //sampling rate
+                .addExtraArgs("-ac","2")                //오디오 2채널
+                .addExtraArgs("-f","mp3")
+                .done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(fFmpeg, fFprobe);		// FFmpeg 명령어 실행을 위한 FFmpegExecutor 객체 생성
+        executor.createJob(builder).run();
+        return outputPath;
+    }
+
+    //멀티파일과 저장할 파일 이름을 받아서 로컬에 저장하고 오디오 생성
+    public String extractAudio(MultipartFile video, String originalFileName) throws IOException {
+        String outputPath = System.getProperty("user.dir") + "/files";
+        String inputPath = System.getProperty("user.dir") + "/files/"+originalFileName;
+        createDirectory(outputPath);
+        log.info("outputPath: " + outputPath);
+        log.info("inputPath: " + inputPath);
+        video.transferTo(new File(inputPath));
+        return extractAudio(inputPath, originalFileName, outputPath);
+    }
+
+    public void createDirectory(String path) {
+        File fileJoinPath = new File(path);
+
+        if (!fileJoinPath.exists()) {
+            fileJoinPath.mkdirs();
+        }
+    }
+
+    @TimeCheck
+    public void writeToFile(String filename, byte[] pData) {
+
+        if(pData == null){
+            return;
+        }
+        int lByteArraySize = pData.length;
+        try{
+            File lOutFile = new File(filename);
+            FileOutputStream lFileOutputStream = new FileOutputStream(lOutFile);
+            lFileOutputStream.write(pData);
+            lFileOutputStream.close();
+        }catch(Throwable e){
+            e.printStackTrace(System.out);
         }
     }
 }

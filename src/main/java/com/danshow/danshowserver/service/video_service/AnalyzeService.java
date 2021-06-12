@@ -1,43 +1,90 @@
 package com.danshow.danshowserver.service.video_service;
 
+import com.danshow.danshowserver.aspect.TimeCheck;
+import com.danshow.danshowserver.config.auth.TokenProvider;
+import com.danshow.danshowserver.domain.user.Member;
+import com.danshow.danshowserver.domain.user.MemberRepository;
 import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.domain.video.FileRepository;
+import com.danshow.danshowserver.domain.video.post.MemberTestVideoPost;
+import com.danshow.danshowserver.domain.video.post.VideoPost;
+import com.danshow.danshowserver.domain.video.repository.VideoPostRepository;
+import com.danshow.danshowserver.web.dto.VideoPostResponseDto;
+import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import com.danshow.danshowserver.web.dto.response.Response;
-import net.bramp.ffmpeg.FFmpeg;
+import com.danshow.danshowserver.web.uploader.S3Uploader;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class AnalyzeService {
 
-    private final String DL_SERVER_URL1 = "";
+    private static final String DL_SERVER_URL1 = "http://99e9fdcb607e.ngrok.io/one";
 
-    private final String DL_SERVER_URL2 = "";
+    private static final String DL_SERVER_URL2 = "http://9f18bc579290.ngrok.io/one";
 
-    private VideoServiceInterface videoServiceInterface;
+    private static final String DL_SERVER_URL3 = "http://4f016f9688b5.ngrok.io/one";
 
-    private VideoFileUtils videoFileUtils;
+    ExchangeStrategies exchangeStrategies =
+            ExchangeStrategies.builder()
+                    .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
+                    .build();// to unlimited memory size .build();
 
-    private ApiService<Response> apiService;
+    WebClient webClient = WebClient.builder()
+            .exchangeStrategies(exchangeStrategies)
+            .build();
 
+    private final VideoServiceInterface videoServiceInterface;
+
+    private final VideoFileUtils videoFileUtils;
+
+    private final ApiService<Response> apiService;
+
+    private final S3Uploader s3Uploader;
+
+    private final TokenProvider tokenProvider;
+
+    private final MemberRepository memberRepository;
+
+    private final VideoPostRepository videoPostRepository;
+
+    private final FileRepository fileRepository;
+
+
+
+    WebClient secondWebClient = WebClient.builder()
+            .exchangeStrategies(exchangeStrategies)
+            .build();
+
+    /*
     @Autowired
-    public AnalyzeService(ApiService<Response> apiService, VideoServiceInterface videoServiceInterface, VideoFileUtils videoFileUtils) {
+    public AnalyzeService(ApiService<Response> apiService, VideoServiceInterface videoServiceInterface,
+                          VideoFileUtils videoFileUtils, S3Uploader s3Uploader, ) {
         this.videoServiceInterface = videoServiceInterface;
         this.apiService = apiService;
         this.videoFileUtils = videoFileUtils;
+        this.s3Uploader = s3Uploader;
     }
+     */
 
     /**
      *
@@ -47,38 +94,85 @@ public class AnalyzeService {
      * 파일을 어떤 경로에서 가져오느냐에 따른 차이. 현재는 s3로 가정 하고 url resource 사용. s3 util을 쓴다면 더 쉬울 것으로 예상
      */
 
-    public File getAnalyzedVideo(Long id) throws IOException {
+    @TimeCheck
+    public String getAnalyzedVideo(MultipartFile memberTestVideo, Long id,String token) throws IOException {
 
-        //1. 요청받은 비디오 파일을 가져온다.
-        AttachFile video = videoServiceInterface.getVideo(id);
-        UrlResource videoFile = new UrlResource(video.getFilePath());
+        //1. 요청받은 비디오 파일을 요청받은 Id의 파일과 함께 합친 후 s3에 업로드한다.
+        File savedIntegratedFile = videoServiceInterface.uploadMemberTestVideo(memberTestVideo, id);
 
         //2. 비디오 파일을 나눈다. (A,B)
-        File originalFile = videoFile.getFile();
-        List<String> fileList = new ArrayList<>();
-        splitVideoIntoTwo(fileList,originalFile,2);
+        String localSavePath = System.getProperty("user.dir")+"/tmp";
+        List<String> fileList =
+                videoFileUtils.splitFile(savedIntegratedFile.getAbsolutePath(),
+                        savedIntegratedFile.getName(),
+                        localSavePath,
+                        3);
 
-        //3-1. A를 DL_SERVER_URL1으로 비동기로 보낸다. (분석이 된 영상을 응답받는다.)
-        UrlResource firstFilResource = new UrlResource(fileList.get(0));
-        File firstFile = firstFilResource.getFile();
-        Response firstAnalyzedFile = apiService.post(DL_SERVER_URL1,HttpHeaders.EMPTY,firstFile, Response.class).getBody();
+        //3-1. A,B를 DL_SERVER_URL1으로 비동기로 보낸다. (분석이 된 영상을 응답받는다.)
+        File firstFils = new File(fileList.get(0));
+        File secondFile = new File(fileList.get(1));
+        File thirdFile = new File(fileList.get(2));
 
-        //3-2. B를 DL_SERVER_URL2으로 비동기로 보낸다. (분석이 된 영상을 응답받는다.)
-        UrlResource secondFileResource = new UrlResource(fileList.get(1));
-        File secondFile = secondFileResource.getFile();
-        Response secondAnalyzedFile = apiService.post(DL_SERVER_URL2, HttpHeaders.EMPTY, secondFile, Response.class).getBody();
+        String firstFilePath = localSavePath+"/01_"+memberTestVideo.getOriginalFilename();
+        String secondFilePath = localSavePath+"/02_"+memberTestVideo.getOriginalFilename();
+        String thirdFilePath = localSavePath +"/03_" + memberTestVideo.getOriginalFilename();
+
+        String originalFileNameWithoutExtension =
+                memberTestVideo.getOriginalFilename().substring(0,memberTestVideo.getOriginalFilename().indexOf("."));
+
+        Tuple3<byte[], byte[], byte[]> fetchVideos = fetchVideos(Files.readAllBytes(firstFils.toPath()),
+                Files.readAllBytes(secondFile.toPath()), Files.readAllBytes(thirdFile.toPath()), token);
+
+        videoFileUtils.writeToFile(firstFilePath, fetchVideos.getT1());
+        videoFileUtils.writeToFile(secondFilePath, fetchVideos.getT2());
+        videoFileUtils.writeToFile(thirdFilePath, fetchVideos.getT3());
 
         //4. 3단계가 모두 완료가 된다면, 비디오 파일을 다시 순서에 맞게 합친다.
-        File analyzedFile;
+        videoFileUtils.createTxt(firstFilePath,localSavePath,originalFileNameWithoutExtension);
+        videoFileUtils.createTxt(secondFilePath,localSavePath,originalFileNameWithoutExtension);
+        videoFileUtils.createTxt(thirdFilePath,localSavePath,originalFileNameWithoutExtension);
 
-        while(true) {
-            if(firstAnalyzedFile != null && secondAnalyzedFile != null) {
-                analyzedFile = new UrlResource(integrateFile(firstAnalyzedFile,secondAnalyzedFile)).getFile();
-                break;
-            }
-        }
+        firstFils.delete();
+        secondFile.delete();
+        thirdFile.delete();
+
+        File analyzedFile = new File(videoFileUtils.integrateFiles(localSavePath,originalFileNameWithoutExtension));
+
+        log.info("final file before s3 path : " + analyzedFile.getAbsolutePath());
+        log.info("final file before s3 filename : " + analyzedFile.getName());
+
+        String userPk = tokenProvider.getUserPk(token);
+        Member ownerMember = memberRepository.findByEmail(userPk);
+        VideoPost videoPost = videoPostRepository.findByFileId(id);
+
+        byte[] obj = s3Uploader.getObject(videoPost.getMusicPath());
+
+        videoFileUtils.writeToFile(System.getProperty("user.dir")+"/tmp/audio.mp3", obj);
+
+        videoFileUtils.integrateAudio(analyzedFile.getAbsolutePath(),System.getProperty("user.dir")+"/tmp/audio.mp3",
+                System.getProperty("user.dir")+"/tmp/output.mp4");
+
+        File finalFile = new File(System.getProperty("user.dir")+"/tmp/output.mp4");
+
+
+        String videoPath = s3Uploader.upload(finalFile.getAbsolutePath()
+                ,analyzedFile.getName(),"video");
+
+        AttachFile savedVideo = AttachFile.builder()
+                .filename(originalFileNameWithoutExtension+"_"+new Date())
+                .filePath(videoPath)
+                .originalFileName(originalFileNameWithoutExtension)
+                .build();
+
+        VideoPostSaveDto videoPostSaveDto = VideoPostSaveDto.of(videoPost,ownerMember);
+
+        MemberTestVideoPost memberTestVideoPost = new MemberTestVideoPost(videoPostSaveDto,ownerMember,savedVideo,videoPost.getImage(),null);
+
+        videoPostRepository.save(memberTestVideoPost);
+
+        log.info("video path : " + videoPath);
         //5. 합쳐진 비디오 파일을 돌려준다.
-        return analyzedFile;
+        return videoPath;
     }
 
     public void splitVideoIntoTwo(List<String> fileList,File originalFile, Integer chunkNumber) throws IOException {
@@ -102,6 +196,8 @@ public class AnalyzeService {
         OutputStream outputStream = new FileOutputStream(videoFile);
 
         System.out.println("file created location : " + videoFile);
+
+        fileList.add(videoFile);
 
         int splitSize = inputStream.available() / chunkNumber ;
         int streamSize = 0;
@@ -181,5 +277,89 @@ public class AnalyzeService {
         return fileJoinPath.getAbsolutePath() +"/"+ joinFileName;
     }
 
+    public Mono<byte[]> getFirstFile(File file) throws IOException {
+
+        byte[] bytes = Files.readAllBytes(file.toPath());
+
+        return webClient
+                .post()
+                .uri(DL_SERVER_URL1)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class);
+    }
+
+    public Mono<byte[]> getFirstFile(byte[] bytes, String token) throws IOException {
+
+        return webClient
+                .post()
+                .uri(DL_SERVER_URL1)
+                .header("X-AUTH-TOKEN",token)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(bytes)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel())
+                .map(x -> {
+                    log.info("async method call : getFirst method called");
+                    return x;
+                });
+    }
+
+    public Mono<byte[]> getSecondFile(File file) throws IOException {
+
+        byte[] bytes = Files.readAllBytes(file.toPath());
+
+        return secondWebClient
+                .post()
+                .uri(DL_SERVER_URL2)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel());
+    }
+
+    public Mono<byte[]> getSecondFile(byte[] bytes, String token) throws IOException {
+
+        return webClient
+                .post()
+                .uri(DL_SERVER_URL2)
+                .header("X-AUTH-TOKEN",token)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(bytes)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel())
+                .map(x -> {
+                    log.info("async method call : getSecondFile method called");
+                    return x;
+                });
+    }
+
+    public Mono<byte[]> getThirdFile(byte[] bytes, String token) throws IOException {
+
+        return webClient
+                .post()
+                .uri(DL_SERVER_URL3)
+                .header("X-AUTH-TOKEN",token)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(bytes)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribeOn(Schedulers.parallel())
+                .map(x -> {
+                    log.info("async method call : getThird method called");
+                    return x;
+                });
+    }
+
+    public Tuple3<byte[], byte[], byte[]> fetchVideos(byte[] firstFile, byte[] secondFile, byte[] thirdFile, String token) throws IOException {
+        return Mono.zip(getFirstFile(firstFile,token), getSecondFile(secondFile,token),getThirdFile(thirdFile,token))
+                .block();
+    }
 
 }

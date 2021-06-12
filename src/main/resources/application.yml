@@ -1,0 +1,63 @@
+spring :
+  profiles:
+    active : release #dev
+    include : oauth, credentials, dev #local
+
+logging:
+  level:
+    org.hibernate.SQL : #debug #sql이 3번씩 출력되길래 주석처리 했습니다. 그래도 2번씩 나옵니다.
+    org.hibernate.type : #trace
+
+cloud:
+  aws:
+    s3:
+      bucket: elasticbeanstalk-ap-northeast-2-600826168989
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      instanceProfile: true # AWS CLI에서 aws configure list 정보를 반영할건지 여부
+---
+spring :
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url : jdbc:mysql://database-1.cayunvr1hlud.ap-northeast-2.rds.amazonaws.com:3306/danshow
+    username : admin
+    password: danshow123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa :
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate :
+        format_sql : true
+
+  data :
+    web :
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 215MB
+
+local:
+  ffmpeg: "/usr/local/bin/ffmpeg"
+  ffprobe: "/usr/local/bin/ffprobe"
+
+
+
+
+
+
+
+

@@ -1,16 +1,16 @@
 package com.danshow.danshowserver.domain.video.post;
 
 import com.danshow.danshowserver.domain.comment.Comment;
+import com.danshow.danshowserver.domain.user.Dancer;
+import com.danshow.danshowserver.domain.video.AttachFile;
+import com.danshow.danshowserver.web.dto.VideoPostSaveDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,14 +23,31 @@ import java.util.List;
 @SuperBuilder
 public class CoverVideoPost extends VideoPost{
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Dancer dancer;
+
     @OneToMany(mappedBy = "coverVideoPost")
     private List<Comment> commentList = new ArrayList<Comment>();
+
+    public CoverVideoPost(VideoPostSaveDto videoPostSaveDto, Dancer dancer,
+                          AttachFile uploadedVideo, AttachFile uploadImage, String audioPath) {
+        super.setData(videoPostSaveDto, uploadedVideo,  uploadImage, audioPath);
+        setUser(dancer);
+    }
 
     public void addComment (Comment comment) {
         this.commentList.add(comment);
         //무한루프 방지
         if(comment.getCoverVideoPost() != this) {
             comment.setCoverVideoPost(this);
+        }
+    }
+
+    public void setUser(Dancer dancer) {
+        this.dancer = dancer;
+        if(!dancer.getCoverVideoList().contains(this)) {
+            dancer.getCoverVideoList().add(this);
         }
     }
 

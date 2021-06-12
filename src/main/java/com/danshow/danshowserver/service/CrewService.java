@@ -8,12 +8,14 @@ import com.danshow.danshowserver.domain.user.UserRepository;
 import com.danshow.danshowserver.web.dto.Thumbnail;
 import com.danshow.danshowserver.web.dto.crew.CrewResponseDto;
 import com.danshow.danshowserver.web.dto.crew.CrewSaveRequestDto;
+import com.danshow.danshowserver.web.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,23 +25,25 @@ public class CrewService {
 
     private final UserRepository userRepository;
     private final DancerRepository dancerRepository;
-    private final HttpSession httpSession;
     private final CrewRepository crewRepository;
+    private final S3Uploader s3Uploader;
 
     @Transactional
-    public void save(MultipartFile image, CrewSaveRequestDto crewSaveRequestDto, String email) {
+    public void save(MultipartFile image, CrewSaveRequestDto crewSaveRequestDto, String email) throws IOException {
 
-        //String image_url = uploadFile(image);
+        String image_url = s3Uploader.upload(image,"image");
         crewRepository.save(Crew.builder()
                 .description(crewSaveRequestDto.getDescription())
-                //.crew_profile_image(crewSaveRequestDto.getImage_url())
+                .crew_profile_image(image_url)
                 .dancer(dancerRepository.findByEmail(email)).build());
     }
 
     @Transactional
-    public void update(CrewSaveRequestDto crewSaveRequestDto, String email) {
+    public void update(MultipartFile image, CrewSaveRequestDto crewSaveRequestDto, String email) throws IOException {
+
+        String image_url = s3Uploader.upload(image,"image");
         Crew crew = crewRepository.findByDancer(dancerRepository.findByEmail(email));
-        //crew.setCrew_profile_image(crewSaveRequestDto.getImage_url());
+        crew.setCrew_profile_image(image_url);
         crew.setDescription(crewSaveRequestDto.getDescription());
     }
 
@@ -65,6 +69,7 @@ public class CrewService {
 
     public Thumbnail makeThumbnail(Crew crew) {
         return Thumbnail.builder()
+                .videoPostId(crew.getId())
                 .title(crew.getTitle())
                 .image_url(crew.getCrew_profile_image())
                 .thumbnailText(crew.getDescription())

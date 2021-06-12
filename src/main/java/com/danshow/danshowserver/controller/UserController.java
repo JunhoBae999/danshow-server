@@ -1,13 +1,10 @@
 package com.danshow.danshowserver.controller;
 
 import com.danshow.danshowserver.config.auth.TokenProvider;
-import com.danshow.danshowserver.domain.user.User;
-import com.danshow.danshowserver.service.DancerService;
-import com.danshow.danshowserver.service.MemberService;
-import com.danshow.danshowserver.web.dto.user.DancerUpdateRequestDto;
-import com.danshow.danshowserver.web.dto.user.MemberResponseDto;
-import com.danshow.danshowserver.web.dto.user.MemberUpdateRequestDto;
-import com.danshow.danshowserver.web.dto.user.OAuthResponseVo;
+import com.danshow.danshowserver.domain.user.Role;
+import com.danshow.danshowserver.service.user_service.DancerService;
+import com.danshow.danshowserver.service.user_service.MemberService;
+import com.danshow.danshowserver.web.dto.user.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Api(tags = {"1.User"})
 @Slf4j
@@ -28,11 +23,15 @@ public class UserController {
     private final DancerService dancerService;
     private final TokenProvider tokenProvider;
 
-    @ApiOperation(value = "로그인" , notes = "구글api 액세스 토큰으로 로그인(회원가입) 합니다")
+    @ApiOperation(value = "로그인" , notes = "이메일과 비밀번호로 로그인합니다.")
     @PostMapping("user/login")
-    public ResponseEntity<String> login(@ApiParam(value = "액세스 토큰", required = true) @RequestBody String access_token) {
-        String Jwt = memberService.login(access_token);
-        return new ResponseEntity<>(Jwt, HttpStatus.OK); //TODO 액세스 토큰이 유효하지 않을 때 리스폰을 어떻게할까
+    public ResponseEntity<String> login(
+            @ApiParam(value = "이메일", required = true) @RequestBody LoginDto loginDto) {
+        String Jwt = memberService.login(loginDto);
+        if(Jwt.equals("")) {
+            return new ResponseEntity<>("Fail to login", HttpStatus.NOT_ACCEPTABLE);
+        }
+        return new ResponseEntity<>(Jwt, HttpStatus.OK);
     }
 
 
@@ -68,5 +67,19 @@ public class UserController {
     @GetMapping("user/info/{id}") //TODO 이메일로 조회할지?
     public ResponseEntity<MemberResponseDto> getUserInfo(@ApiParam(value = "유저 식별")@PathVariable Long id) {
         return new ResponseEntity<>(memberService.findById(id),HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "회원가입", notes = "넘겨 준 정보로 회원가입을 합니다.")
+    @PostMapping("user/sign-up")
+    public ResponseEntity<String> save(@RequestBody MemberSaveRequestDto requestDto) {
+        try {
+            Long result = memberService.save(requestDto);
+            if(result < 0) {
+                return new ResponseEntity<>("Same email is already exist.",HttpStatus.NOT_ACCEPTABLE);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Need correct information", HttpStatus.NOT_ACCEPTABLE);
+        }
+        return new ResponseEntity<>("Sign up success",HttpStatus.OK);
     }
 }
