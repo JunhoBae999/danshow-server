@@ -90,9 +90,9 @@ public class VideoController {
 
     @ApiOperation(value = "유저 테스트 비디오 업로드",notes = "유저가 음원과 함께 녹화한 비디오를 업로드합니다.")
     @PostMapping("/api/v1/member-test/{id}")
-    public ResponseEntity<Void> uploadUserTestVideo(@ApiParam(value = "영상 식별자",required = true) @PathVariable Long id,
-                                                          @ApiParam(value = "유저 테스트 비디오") @RequestPart MultipartFile userTestVideo,
-                                                          @ApiParam(value = "JWT토큰", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
+    public ResponseEntity<Void> uploadUserTestVideo(@ApiParam(value = "video id",required = true) @PathVariable Long id,
+                                                          @ApiParam(value = "test video of member") @RequestPart MultipartFile userTestVideo,
+                                                          @ApiParam(value = "jwt token", required = true) @RequestHeader(value="X-AUTH-TOKEN") String Jwt) throws IOException {
 
         analyzeService.getAnalyzedVideo(userTestVideo,id,Jwt);
         return new ResponseEntity<>(HttpStatus.OK);

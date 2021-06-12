@@ -38,14 +38,20 @@ import java.util.List;
 @Slf4j
 public class AnalyzeService {
 
-    //private static final String DL_SERVER_URL1 = "http://localhost:8080/mirror";
     private static final String DL_SERVER_URL1 = "http://99e9fdcb607e.ngrok.io/one";
 
-    //private static final String DL_SERVER_URL2 = "http://localhost:8080/mirror";
     private static final String DL_SERVER_URL2 = "http://9f18bc579290.ngrok.io/one";
 
     private static final String DL_SERVER_URL3 = "http://4f016f9688b5.ngrok.io/one";
-    //private static final String DL_SERVER_URL3 = "http://localhost:8080/mirror";
+
+    ExchangeStrategies exchangeStrategies =
+            ExchangeStrategies.builder()
+                    .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
+                    .build();// to unlimited memory size .build();
+
+    WebClient webClient = WebClient.builder()
+            .exchangeStrategies(exchangeStrategies)
+            .build();
 
     private final VideoServiceInterface videoServiceInterface;
 
@@ -63,14 +69,7 @@ public class AnalyzeService {
 
     private final FileRepository fileRepository;
 
-    ExchangeStrategies exchangeStrategies =
-            ExchangeStrategies.builder()
-                    .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
-        .build();// to unlimited memory size .build();
 
-    WebClient webClient = WebClient.builder()
-            .exchangeStrategies(exchangeStrategies)
-            .build();
 
     WebClient secondWebClient = WebClient.builder()
             .exchangeStrategies(exchangeStrategies)

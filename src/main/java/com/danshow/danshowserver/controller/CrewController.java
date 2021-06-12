@@ -59,4 +59,10 @@ public class CrewController {
     public ResponseEntity<List<Thumbnail>> crewMain() {
         return new ResponseEntity<>(crewService.crewMainList(), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "테스트 하려고 만든 메서드", notes = "테스트하려고만든메서드")
+    @PostMapping("/test")
+    public ResponseEntity<String> testController(String testValue) {
+        return new ResponseEntity<String>(testValue,HttpStatus.OK );
+    }
 }
